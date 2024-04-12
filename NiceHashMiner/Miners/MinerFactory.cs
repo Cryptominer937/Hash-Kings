@@ -24,6 +24,8 @@ namespace NiceHashMiner.Miners {
                 return new ClaymoreNeoscryptMiner();
             } else if (AlgorithmType.CryptoNight == algorithmType) {
                 return new ClaymoreCryptoNightMiner();
+            } else if (AlgorithmType.CryptoNightV7 == algorithmType)  {
+                return new ClaymoreCryptoNightMiner();
             } else if (AlgorithmType.DaggerHashimoto == algorithmType) {
                 return new ClaymoreDual(secondaryAlgorithmType);
             }
@@ -45,6 +47,8 @@ namespace NiceHashMiner.Miners {
                     return new sgminer();
                 case MinerBaseType.GatelessGate:
                     return new glg();
+                case MinerBaseType.CastXMR:
+                    return new CastXMR();
                 case MinerBaseType.nheqminer:
                     return new nheqminer();
                 case MinerBaseType.ethminer:
@@ -69,6 +73,10 @@ namespace NiceHashMiner.Miners {
                     return new Prospector();
                 case MinerBaseType.Xmrig:
                     return new Xmrig();
+                case MinerBaseType.XmrigAMD:
+                    return new XmrigAMD();
+                case MinerBaseType.XmrigNVIDIA:
+                    return new XmrigNVIDIA();
                 case MinerBaseType.XmrStakAMD:
                     return new XmrStakAMD();
                 case MinerBaseType.Claymore_old:

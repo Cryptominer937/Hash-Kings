@@ -92,6 +92,8 @@ namespace NiceHashMiner.Miners.Grouping
             public const string XmrStackCPUMiner = _bin + @"\xmr-stak-cpu\xmr-stak-cpu.exe";
             public const string XmrStakAMD = _bin + @"\xmr-stak-amd\xmr-stak-amd.exe";
             public const string Xmrig = _bin + @"\xmrig\xmrig.exe";
+            public const string XmrigAMD = _bin + @"\xmrig-amd\xmrig-amd.exe";
+            public const string XmrigNVIDIA = _bin + @"\xmrig-nvidia\xmrig-nvidia.exe";
 
             public const string NONE = "";
 
@@ -105,6 +107,7 @@ namespace NiceHashMiner.Miners.Grouping
             public const string ClaymoreDual = _bin_3rdparty + @"\claymore_dual\EthDcrMiner64.exe";
             public const string EWBF = _bin_3rdparty + @"\ewbf\miner.exe";
             public const string DSTM = _bin_3rdparty + @"\dstm\zm.exe";
+            public const string CastXMR = _bin_3rdparty + @"\castxmr\cast_xmr-vega.exe";
             public const string hsrneoscrypt = _bin_3rdparty + @"\hsrminer_neoscrypt\hsrminer_neoscrypt.exe";
             public const string prospector = _bin_3rdparty + @"\prospector\prospector.exe";
             public const string mkxminer = _bin_3rdparty + @"\mkxminer\mkxminer.exe";
@@ -138,6 +141,8 @@ namespace NiceHashMiner.Miners.Grouping
                     return AMD_GROUP.sgminer_path(algoType);
                 case MinerBaseType.GatelessGate:
                     return AMD_GROUP.glg_path(algoType);
+                case MinerBaseType.CastXMR:
+                    return Data.CastXMR;
                 case MinerBaseType.nheqminer:
                     return Data.nheqminer;
                 case MinerBaseType.ethminer:
@@ -162,6 +167,10 @@ namespace NiceHashMiner.Miners.Grouping
                     return Data.prospector;
                 case MinerBaseType.Xmrig:
                     return Data.Xmrig;
+                case MinerBaseType.XmrigAMD:
+                    return Data.XmrigAMD;
+                case MinerBaseType.XmrigNVIDIA:
+                    return Data.XmrigNVIDIA;
                 case MinerBaseType.XmrStakAMD:
                     return Data.XmrStakAMD;
                 case MinerBaseType.Claymore_old:
@@ -206,6 +215,14 @@ namespace NiceHashMiner.Miners.Grouping
 
         ////// private stuff from here on
         static class NVIDIA_GROUPS {
+            public static string XmrigNVIDIA(AlgorithmType algorithmType)
+            {
+                if (AlgorithmType.CryptoNightV7 == algorithmType)
+                {
+                    return Data.XmrigNVIDIA;
+                }
+                return Data.XmrigNVIDIA;
+            }
             public static string ccminer_sm21_or_sm3x(AlgorithmType algorithmType) {
                 if (AlgorithmType.Decred == algorithmType) {
                     return Data.ccminer_decred;
@@ -295,6 +312,22 @@ namespace NiceHashMiner.Miners.Grouping
         }
 
         static class AMD_GROUP {
+            public static string XmrigAMD(AlgorithmType algorithmType)
+            {
+                if (AlgorithmType.CryptoNightV7 == algorithmType)
+                {
+                    return Data.XmrigAMD;
+                }
+                return Data.XmrigAMD;
+            }
+            public static string CastXMR(AlgorithmType algorithmType)
+            {
+                if (AlgorithmType.CryptoNightV7 == algorithmType || AlgorithmType.CryptoNight == algorithmType)
+                {
+                    return Data.CastXMR;
+                }
+                return Data.CastXMR;
+            }
             public static string sgminer_path(AlgorithmType type) {
                 if (AlgorithmType.CryptoNight == type || AlgorithmType.DaggerHashimoto == type) {
                     return Data.sgminer_gm;
@@ -317,6 +350,8 @@ namespace NiceHashMiner.Miners.Grouping
                 } else if (AlgorithmType.NeoScrypt == type) {
                     return Data.ClaymoreNeoscryptMiner;
                 } else if(AlgorithmType.CryptoNight == type) {
+                    return Data.ClaymoreCryptoNightMiner;
+                } else if (AlgorithmType.CryptoNightV7 == type) {
                     return Data.ClaymoreCryptoNightMiner;
                 } else if (AlgorithmType.DaggerHashimoto == type) {
                     return Data.ClaymoreDual;

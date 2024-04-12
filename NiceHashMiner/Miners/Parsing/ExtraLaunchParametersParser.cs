@@ -237,6 +237,10 @@ namespace NiceHashMiner.Miners.Parsing {
             {
                 return MinerType.glg;
             }
+            if (MinerBaseType.CastXMR == minerBaseType)
+            {
+                return MinerType.CastXMR;
+            }
             if (MinerBaseType.mkxminer == minerBaseType)
             {
                 return MinerType.mkxminer;
@@ -253,6 +257,10 @@ namespace NiceHashMiner.Miners.Parsing {
             }
             if (MinerBaseType.Claymore == minerBaseType) {
                 if (AlgorithmType.CryptoNight == algorithmType) {
+                    return MinerType.ClaymoreCryptoNight;
+                }
+                if (AlgorithmType.CryptoNightV7 == algorithmType)
+                {
                     return MinerType.ClaymoreCryptoNight;
                 }
                 if (AlgorithmType.Equihash == algorithmType)
@@ -317,6 +325,14 @@ namespace NiceHashMiner.Miners.Parsing {
             }
             if (MinerBaseType.Xmrig == minerBaseType) {
                 return MinerType.Xmrig;
+            }
+            if (MinerBaseType.XmrigAMD == minerBaseType)
+            {
+                return MinerType.XmrigAMD;
+            }
+            if (MinerBaseType.XmrigNVIDIA == minerBaseType)
+            {
+                return MinerType.XmrigNVIDIA;
             }
 
             return MinerType.NONE;

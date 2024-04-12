@@ -10,16 +10,20 @@ using Newtonsoft.Json.Linq;
 using NiceHashMiner.Configs;
 using NiceHashMiner.Enums;
 using NiceHashMiner.Miners.Parsing;
+using NiceHashMiner.Devices;
 
 namespace NiceHashMiner.Miners
 {
-    public class Xmrig : Miner
+    public class XmrigAMD : Miner
     {
+        private readonly int GPUPlatformNumber;
         private int _benchmarkTimeWait = 120;
-        private const string _lookForStart = "speed 2.5s/60s/15m";
+        private const string _lookForStart = "speed 10s/60s/15m";
         private const string _lookForEnd = "h/s max";
 
-        public Xmrig() : base("Xmrig") { }
+        public XmrigAMD() : base("XmrigAMD") {
+            GPUPlatformNumber = ComputeDeviceManager.Avaliable.AMDOpenCLPlatformNum;
+        }
 
         public override void Start(string url, string btcAdress, string worker) {
             LastCommandLine = GetStartCommand(url, btcAdress, worker);
@@ -27,26 +31,13 @@ namespace NiceHashMiner.Miners
         }
 
         private string GetStartCommand(string url, string btcAdress, string worker) {
-            var extras = ExtraLaunchParametersParser.ParseForMiningSetup(MiningSetup, DeviceType.CPU);
-            if (url.Contains("cryptonightv7"))
-            {
-//                Helpers.ConsolePrint("XMRIG", "CryptoNightV7");
-                return $" -o {url} -u {btcAdress}.{worker}:x --nicehash {extras} --api-port {APIPort} --donate-level=1"
-                     + $" -o stratum+tcp://cryptonightv7.usa.nicehash.com:3363 -u {btcAdress}.{worker}:x --nicehash {extras} --api-port {APIPort}"
-                     + $" -o stratum+tcp://cryptonightv7.hk.nicehash.com:3363 -u {btcAdress}.{worker}:x --nicehash {extras} --api-port {APIPort}"
-                     + $" -o stratum+tcp://cryptonightv7.jp.nicehash.com:3363 -u {btcAdress}.{worker}:x --nicehash {extras} --api-port {APIPort}"
-                     + $" -o stratum+tcp://cryptonightv7.in.nicehash.com:3363 -u {btcAdress}.{worker}:x --nicehash {extras} --api-port {APIPort}"
-                     + $" -o stratum+tcp://cryptonightv7.br.nicehash.com:3363 -u {btcAdress}.{worker}:x --nicehash {extras} --api-port {APIPort}";
-            }
-            else
-            {
-                return $" -o {url} -u {btcAdress}.{worker}:x --nicehash {extras} --api-port {APIPort} --donate-level=1"
-                     + $" -o stratum+tcp://cryptonight.usa.nicehash.com:3355 -u {btcAdress}.{worker}:x --nicehash {extras} --api-port {APIPort}"
-                     + $" -o stratum+tcp://cryptonight.hk.nicehash.com:3355 -u {btcAdress}.{worker}:x --nicehash {extras} --api-port {APIPort}"
-                     + $" -o stratum+tcp://cryptonight.jp.nicehash.com:3355 -u {btcAdress}.{worker}:x --nicehash {extras} --api-port {APIPort}"
-                     + $" -o stratum+tcp://cryptonight.in.nicehash.com:3355 -u {btcAdress}.{worker}:x --nicehash {extras} --api-port {APIPort}"
-                     + $" -o stratum+tcp://cryptonight.br.nicehash.com:3355 -u {btcAdress}.{worker}:x --nicehash {extras} --api-port {APIPort}";
-            }
+            var extras = ExtraLaunchParametersParser.ParseForMiningSetup(MiningSetup, DeviceType.AMD);
+            return $" -o {url} -u {btcAdress}.{worker}:x --nicehash {extras} --api-port {APIPort} --donate-level=1"
+                + $" -o stratum+tcp://cryptonightv7.usa.nicehash.com:3363 -u {btcAdress}.{worker}:x "
+                + $" -o stratum+tcp://cryptonightv7.hk.nicehash.com:3363 -u {btcAdress}.{worker}:x "
+                + $" -o stratum+tcp://cryptonightv7.jp.nicehash.com:3363 -u {btcAdress}.{worker}:x "
+                + $" -o stratum+tcp://cryptonightv7.in.nicehash.com:3363 -u {btcAdress}.{worker}:x "
+                + " --opencl-devices=" + GetDevicesCommandString().TrimStart()+ " --opencl-platform=" + GPUPlatformNumber; ; 
         }
 
         protected override void _Stop(MinerStopType willswitch) {
@@ -87,7 +78,6 @@ namespace NiceHashMiner.Miners
             var sixtySecTotal = 0d;
             var twoSecCount = 0;
             var sixtySecCount = 0;
-
             foreach (var line in lines) {
                 bench_lines.Add(line);
                 var lineLowered = line.ToLower();
@@ -111,6 +101,7 @@ namespace NiceHashMiner.Miners
                 // Run iff no 60s averages are reported but 2.5s are
                 BenchmarkAlgorithm.BenchmarkSpeed = twoSecTotal / twoSecCount;
             }
+
         }
 
         protected override void BenchmarkOutputErrorDataReceivedImpl(string outdata) {
