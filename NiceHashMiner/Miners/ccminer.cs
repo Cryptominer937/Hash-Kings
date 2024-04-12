@@ -1,216 +1,283 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Globalization;
-using System.Net;
-using System.Net.Sockets;
-using System.Windows.Forms;
-using System.Diagnostics;
-using System.IO;
-using NiceHashMiner.Configs;
-using NiceHashMiner.Enums;
-using NiceHashMiner.Devices;
-using NiceHashMiner.Miners.Grouping;
+﻿using NiceHashMiner.Miners.Grouping;
 using NiceHashMiner.Miners.Parsing;
+using System;
+using System.Diagnostics;
+using System.Globalization;
+using System.Linq;
 using System.Threading.Tasks;
+using NiceHashMiner.Algorithms;
+using NiceHashMinerLegacy.Common.Enums;
+using NiceHashMiner.Configs;
+using System.Threading;
 
 namespace NiceHashMiner.Miners
 {
-    public class ccminer : Miner
+    public class Ccminer : Miner
     {
-        public ccminer() : base("ccminer_NVIDIA") { }
+        public Ccminer() : base("ccminer_NVIDIA")
+        { }
 
-        // cryptonight benchmark exception
-        int _cryptonightTotalCount = 0;
-        double _cryptonightTotal = 0;
-        const int _cryptonightTotalDelim = 2;
-        bool benchmarkException {
-            get {
-                return MiningSetup.MinerPath == MinerPaths.Data.ccminer_cryptonight
-                    || MiningSetup.MinerPath == MinerPaths.Data.ccminer_klaust;
-            }
-        }
+        private int TotalCount = 0;
 
-        protected override int GET_MAX_CooldownTimeInMilliseconds() {
-            if (this.MiningSetup.MinerPath == MinerPaths.Data.ccminer_x11gost) {
-                return 60 * 1000 * 3; // wait a little longer
+        private double Total = 0;
+        private const int TotalDelim = 2;
+
+        private bool _benchmarkException => MiningSetup.MinerPath == MinerPaths.Data.CcminerCryptonight
+                                           || MiningSetup.MinerPath == MinerPaths.Data.CcminerKlausT
+            || MiningSetup.MinerPath == MinerPaths.Data.CcminerTPruvot
+            || MiningSetup.MinerPath == MinerPaths.Data.CcminerX11Gost
+            || MiningSetup.MinerPath == MinerPaths.Data.CcminerDecred
+            || MiningSetup.MinerPath == MinerPaths.Data.CcminerNanashi
+            || MiningSetup.MinerPath == MinerPaths.Data.CcminerSp;
+
+        protected override int GetMaxCooldownTimeInMilliseconds()
+        {
+            if (MiningSetup.MinerPath == MinerPaths.Data.CcminerX11Gost)
+            {
+                return 60 * 1000 * 5; 
             }
-            return 60 * 1000; // 1 minute max, whole waiting time 75seconds
+            return 60 * 1000 * 8; 
         }
 
         public override void Start(string url, string btcAdress, string worker)
         {
-            if (!IsInit) {
-                Helpers.ConsolePrint(MinerTAG(), "MiningSetup is not initialized exiting Start()");
+            if (!IsInit)
+            {
+                Helpers.ConsolePrint(MinerTag(), "MiningSetup is not initialized exiting Start()");
                 return;
             }
-            string username = GetUsername(btcAdress, worker);
+            var username = GetUsername(btcAdress, worker);
 
-            IsAPIReadException = MiningSetup.MinerPath == MinerPaths.Data.ccminer_cryptonight;
+            IsApiReadException = MiningSetup.MinerPath == MinerPaths.Data.CcminerCryptonight;
 
-            string algo = "";
-            string apiBind = "";
-            if (!IsAPIReadException) {
-                algo = "--algo=" + MiningSetup.MinerName;
-                apiBind = " --api-bind=" + APIPort.ToString();
-            }
-            /*
-            LastCommandLine = algo +
-                                  " --url=" + url +
-                                  " --userpass=" + username + ":x " +
-                                  apiBind + " " +
-                                  ExtraLaunchParametersParser.ParseForMiningSetup(
-                                                                MiningSetup,
-                                                                DeviceType.NVIDIA) +
-                                  " --devices ";
-*/
-            //add failover
+            var algo = "";
+            var apiBind = "";
             string alg = url.Substring(url.IndexOf("://") + 3, url.IndexOf(".") - url.IndexOf("://") - 3);
             string port = url.Substring(url.IndexOf(".com:") + 5, url.Length - url.IndexOf(".com:") - 5);
+            if (!IsApiReadException)
+            {
+                algo = "--algo=" + MiningSetup.MinerName;
+                apiBind = " --api-bind=" + ApiPort;
+            }
 
             LastCommandLine = algo +
-                              " --url=" + url +
-                              " --userpass=" + username + ":x " +
-                              " --url stratum+tcp://" + alg + ".hk.nicehash.com:" + port +
-                              " --userpass=" + username + ":x " +
-                              " --url stratum+tcp://" + alg + ".in.nicehash.com:" + port +
-                              " --userpass=" + username + ":x " +
-                              " --url stratum+tcp://" + alg + ".jp.nicehash.com:" + port +
-                              " --userpass=" + username + ":x " +
-                              " --url stratum+tcp://" + alg + ".usa.nicehash.com:" + port +
-                              " --userpass=" + username + ":x " +
-                              " --url stratum+tcp://" + alg + ".br.nicehash.com:" + port +
-                              " --userpass=" + username + ":x " +
-                              " --url stratum+tcp://" + alg + ".eu.nicehash.com:" + port +
-                              " --userpass=" + username + ":x " +
-                              apiBind + " " +
-                                  ExtraLaunchParametersParser.ParseForMiningSetup(
-                                                                MiningSetup,
-                                                                DeviceType.NVIDIA) +
-                                  " --devices ";
+                " --url=" + url + " --userpass=" + username + ":x" +
+                " --url=stratum+tcp://" + alg + ".hk.nicehash.com:" + port + " " + " --userpass=" + username + ":x" +
+                " --url=stratum+tcp://" + alg + ".jp.nicehash.com:" + port + " " + " --userpass=" + username + ":x" +
+                " --url=stratum+tcp://" + alg + ".in.nicehash.com:" + port + " " + " --userpass=" + username + ":x" +
+                " --url=stratum+tcp://" + alg + ".br.nicehash.com:" + port + " " + " --userpass=" + username + ":x" +
+                " --url=stratum+tcp://" + alg + ".usa.nicehash.com:" + port + " " + " --userpass=" + username + ":x" +
+                " --url=stratum+tcp://" + alg + ".eu.nicehash.com:" + port + " --userpass=" + username + ":x" +
+                " --userpass=" + username + ":x" + apiBind +
+                " --devices " + GetDevicesCommandString() + " " +
+                ExtraLaunchParametersParser.ParseForMiningSetup(MiningSetup, DeviceType.NVIDIA) + " ";
 
-            LastCommandLine += GetDevicesCommandString();
 
+            /*
+                        LastCommandLine = $"{algo} --url={url} --userpass={username}:x {apiBind} " +
+                                          $"--devices {GetDevicesCommandString()} " +
+                                          $"{ExtraLaunchParametersParser.ParseForMiningSetup(MiningSetup, DeviceType.NVIDIA)} ";
+            */
             ProcessHandle = _Start();
         }
 
-        protected override void _Stop(MinerStopType willswitch) {
+        protected override void _Stop(MinerStopType willswitch)
+        {
             Stop_cpu_ccminer_sgminer_nheqminer(willswitch);
         }
 
         // new decoupled benchmarking routines
+
         #region Decoupled benchmarking routines
 
-        protected override string BenchmarkCreateCommandLine(Algorithm algorithm, int time) {
-            string timeLimit = (benchmarkException) ? "" : " --time-limit " + time.ToString();
-            string CommandLine = " --algo=" + algorithm.MinerName +
-                              " --benchmark" +
+        protected override string BenchmarkCreateCommandLine(Algorithm algorithm, int time)
+        {
+            string url = Globals.GetLocationUrl(algorithm.NiceHashID, Globals.MiningLocation[ConfigManager.GeneralConfig.ServiceLocation], this.ConectionType);
+            string alg = url.Substring(url.IndexOf("://") + 3, url.IndexOf(".") - url.IndexOf("://") - 3);
+            string port = url.Substring(url.IndexOf(".com:") + 5, url.Length - url.IndexOf(".com:") - 5);
+            var username = GetUsername(Globals.DemoUser, ConfigManager.GeneralConfig.WorkerName.Trim());
+
+            var timeLimit = (_benchmarkException) ? "" : " --time-limit 300";
+            var commandLine = " --algo=" + algorithm.MinerName +
+                             " --url=" + url + " --userpass=" + username + ":x" +
+                " --url=stratum+tcp://" + alg + ".hk.nicehash.com:" + port + " " + " --userpass=" + username + ":x" +
+                " --url=stratum+tcp://" + alg + ".jp.nicehash.com:" + port + " " + " --userpass=" + username + ":x" +
+                " --url=stratum+tcp://" + alg + ".in.nicehash.com:" + port + " " + " --userpass=" + username + ":x" +
+                " --url=stratum+tcp://" + alg + ".br.nicehash.com:" + port + " " + " --userpass=" + username + ":x" +
+                " --url=stratum+tcp://" + alg + ".usa.nicehash.com:" + port + " " + " --userpass=" + username + ":x" +
+                " --url=stratum+tcp://" + alg + ".eu.nicehash.com:" + port + " --userpass=" + username + ":x" +
                               timeLimit + " " +
                               ExtraLaunchParametersParser.ParseForMiningSetup(
-                                                                MiningSetup,
-                                                                DeviceType.NVIDIA) +
+                                  MiningSetup,
+                                  DeviceType.NVIDIA) +
                               " --devices ";
 
-            CommandLine += GetDevicesCommandString();
+            commandLine += GetDevicesCommandString();
 
-            // cryptonight exception helper variables
-            _cryptonightTotalCount = BenchmarkTimeInSeconds / _cryptonightTotalDelim;
-            _cryptonightTotal = 0.0d;
+            TotalCount = 15;
+            if (MiningSetup.MinerPath == MinerPaths.Data.CcminerX11Gost || MiningSetup.MinerPath == MinerPaths.Data.CcminerNanashi)
+            {
+                TotalCount = 3;
+            }
 
-            return CommandLine;
+            if (MiningSetup.MinerPath == MinerPaths.Data.CcminerTPruvot || MiningSetup.MinerPath == MinerPaths.Data.CcminerKlausT)
+            {
+                TotalCount = 5;
+            }
+            Total = 0.0d;
+
+            return commandLine;
         }
 
-        protected override bool BenchmarkParseLine(string outdata) {
-            // cryptonight exception
-            if (benchmarkException) {
-                int speedLength = (BenchmarkAlgorithm.NiceHashID == AlgorithmType.CryptoNight) ? 6 : 8;
-                if (outdata.Contains("Total: ")) {
-                    int st = outdata.IndexOf("Total:") + 7;
-                    int len = outdata.Length - speedLength - st;
+        protected override bool BenchmarkParseLine(string outdata)
+        {
+            int count = 0;
+            double speed = 0;
 
-                    string parse = outdata.Substring(st, len).Trim();
-                    double tmp;
-                    Double.TryParse(parse, NumberStyles.Any, CultureInfo.InvariantCulture, out tmp);
+            if (_benchmarkException)
+            {
+                if ( outdata.Contains("GPU") && outdata.Contains("/s") )
+                {
+                   
+                    var st = outdata.IndexOf(", ");
+                    var e = outdata.IndexOf("/s");
 
+                    var parse = outdata.Substring(st+2, e - st -5).Trim();
+                    double tmp = Double.Parse(parse, CultureInfo.InvariantCulture);
                     // save speed
-                    int i = outdata.IndexOf("Benchmark:");
-                    int k = outdata.IndexOf("/s");
-                    string hashspeed = outdata.Substring(i + 11, k - i - 9);
-                    int b = hashspeed.IndexOf(" ");
-                    if (hashspeed.Contains("kH/s"))
+
+                    if (outdata.Contains("kH/s"))
                         tmp *= 1000;
-                    else if (hashspeed.Contains("MH/s"))
+                    else if (outdata.Contains("MH/s"))
                         tmp *= 1000000;
-                    else if (hashspeed.Contains("GH/s"))
+                    else if (outdata.Contains("GH/s"))
                         tmp *= 1000000000;
 
-                    _cryptonightTotal += tmp;
-                    _cryptonightTotalCount--;
+ 
+                        speed += tmp;
+
+                    count++;
+                    TotalCount--;
                 }
-                if (_cryptonightTotalCount <= 0) {
-                    double spd = _cryptonightTotal / (BenchmarkTimeInSeconds / _cryptonightTotalDelim);
-                    BenchmarkAlgorithm.BenchmarkSpeed = spd;
+                if (TotalCount <= 0)
+                {
+                    var spd = Total / count;
+                    BenchmarkAlgorithm.BenchmarkSpeed = speed;
                     BenchmarkSignalFinnished = true;
                 }
+
+                return false;
             }
 
-            double lastSpeed = BenchmarkParseLine_cpu_ccminer_extra(outdata);
-            if (lastSpeed > 0.0d) {
-                BenchmarkAlgorithm.BenchmarkSpeed = lastSpeed;
+            if (speed > 0.0d)
+            {
+                BenchmarkAlgorithm.BenchmarkSpeed = speed;
                 return true;
             }
 
-            if (double.TryParse(outdata, out lastSpeed)) {
-                BenchmarkAlgorithm.BenchmarkSpeed = lastSpeed;
-                return true;
-            }
             return false;
         }
 
-        protected override void BenchmarkOutputErrorDataReceivedImpl(string outdata) {
+               protected override void BenchmarkOutputErrorDataReceivedImpl(string outdata)
+        {
             CheckOutdata(outdata);
         }
+        protected override void BenchmarkThreadRoutine(object CommandLine)
+        {
+            BenchmarkSignalQuit = false;
+            BenchmarkSignalHanged = false;
+            BenchmarkSignalFinnished = false;
+            BenchmarkException = null;
+
+            Thread.Sleep(ConfigManager.GeneralConfig.MinerRestartDelayMS);
+
+            try
+            {
+                Helpers.ConsolePrint("BENCHMARK", "Benchmark starts");
+                BenchmarkHandle = BenchmarkStartProcess((string)CommandLine);
+
+                BenchmarkThreadRoutineStartSettup();
+                BenchmarkTimeInSeconds = 300;
+                BenchmarkProcessStatus = BenchmarkProcessStatus.Running;
+                var exited = BenchmarkHandle.WaitForExit((BenchmarkTimeoutInSeconds(BenchmarkTimeInSeconds) + 20) * 1000);
+                if (BenchmarkSignalTimedout && !TimeoutStandard)
+                {
+                    throw new Exception("Benchmark timedout");
+                }
+
+                if (BenchmarkException != null)
+                {
+                    throw BenchmarkException;
+                }
+
+                if (BenchmarkSignalQuit)
+                {
+                    throw new Exception("Termined by user request");
+                }
+
+                if (BenchmarkSignalHanged || !exited)
+                {
+                    throw new Exception("Miner is not responding");
+                }
+
+                if (BenchmarkSignalFinnished)
+                {
+                    //break;
+                }
+            }
+            catch (Exception ex)
+            {
+                BenchmarkThreadRoutineCatch(ex);
+            }
+            finally
+            {
+                BenchmarkThreadRoutineFinish();
+            }
+        }
+
 
         #endregion // Decoupled benchmarking routines
 
-        public override async Task<APIData> GetSummaryAsync() {
-            // CryptoNight does not have api bind port
-            if (IsAPIReadException) {
-                // check if running
-                if (ProcessHandle == null) {
-                    _currentMinerReadStatus = MinerAPIReadStatus.RESTART;
-                    Helpers.ConsolePrint(MinerTAG(), ProcessTag() + " Could not read data from CryptoNight Proccess is null");
-                    return null;
-                }
-                try {
-                    var runningProcess = Process.GetProcessById(ProcessHandle.Id);
-                } catch (ArgumentException ex) {
-                    _currentMinerReadStatus = MinerAPIReadStatus.RESTART;
-                    Helpers.ConsolePrint(MinerTAG(), ProcessTag() + " Could not read data from CryptoNight reason: " + ex.Message);
-                    return null; // will restart outside
-                } catch (InvalidOperationException ex) {
-                    _currentMinerReadStatus = MinerAPIReadStatus.RESTART;
-                    Helpers.ConsolePrint(MinerTAG(), ProcessTag() + " Could not read data from CryptoNight reason: " + ex.Message);
-                    return null; // will restart outside
-                }
-
-                var totalSpeed = 0.0d;
-                foreach (var miningPair in MiningSetup.MiningPairs) {
-                    var algo = miningPair.Device.GetAlgorithm(MinerBaseType.ccminer, AlgorithmType.CryptoNight, AlgorithmType.NONE);
-                    if (algo != null) {
-                        totalSpeed += algo.BenchmarkSpeed;
-                    }
-                }
-
-                APIData CryptoNightData = new APIData(MiningSetup.CurrentAlgorithmType);
-                CryptoNightData.Speed = totalSpeed;
-                _currentMinerReadStatus = MinerAPIReadStatus.GOT_READ;
-                // check if speed zero
-                if (CryptoNightData.Speed == 0) _currentMinerReadStatus = MinerAPIReadStatus.READ_SPEED_ZERO;
-                return CryptoNightData;
+        public override async Task<ApiData> GetSummaryAsync()
+        {
+            if (!IsApiReadException) return await GetSummaryCpuCcminerAsync();
+            // check if running
+            if (ProcessHandle == null)
+            {
+                CurrentMinerReadStatus = MinerApiReadStatus.RESTART;
+                Helpers.ConsolePrint(MinerTag(), ProcessTag() + " Could not read data from CryptoNight Proccess is null");
+                return null;
             }
-            return await GetSummaryCPU_CCMINERAsync();
-        }
+            try
+            {
+                Process.GetProcessById(ProcessHandle.Id);
+            }
+            catch (ArgumentException ex)
+            {
+                CurrentMinerReadStatus = MinerApiReadStatus.RESTART;
+                Helpers.ConsolePrint(MinerTag(), ProcessTag() + " Could not read data from CryptoNight reason: " + ex.Message);
+                return null; // will restart outside
+            }
+            catch (InvalidOperationException ex)
+            {
+                CurrentMinerReadStatus = MinerApiReadStatus.RESTART;
+                Helpers.ConsolePrint(MinerTag(), ProcessTag() + " Could not read data from CryptoNight reason: " + ex.Message);
+                return null; // will restart outside
+            }
 
+            var totalSpeed = MiningSetup.MiningPairs
+                .Select(miningPair =>
+                    miningPair.Device.GetAlgorithm(MinerBaseType.ccminer, AlgorithmType.CryptoNight, AlgorithmType.NONE))
+                .Where(algo => algo != null).Sum(algo => algo.BenchmarkSpeed);
+
+            var cryptoNightData = new ApiData(MiningSetup.CurrentAlgorithmType)
+            {
+                Speed = totalSpeed
+            };
+            CurrentMinerReadStatus = MinerApiReadStatus.GOT_READ;
+            // check if speed zero
+            if (cryptoNightData.Speed == 0) CurrentMinerReadStatus = MinerApiReadStatus.READ_SPEED_ZERO;
+            return cryptoNightData;
+        }
     }
 }

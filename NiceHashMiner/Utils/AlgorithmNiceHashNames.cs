@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using NiceHashMiner.Enums;
+using NiceHashMinerLegacy.Common.Enums;
 
 namespace NiceHashMiner
 {
@@ -10,8 +8,11 @@ namespace NiceHashMiner
     /// </summary>
     public static class AlgorithmNiceHashNames
     {
-        public static string GetName(AlgorithmType type) {
-            if ((AlgorithmType.INVALID <= type && type <= AlgorithmType.CryptoNightV7) || (AlgorithmType.DaggerBlake2s <= type && type <= AlgorithmType.DaggerPascal)) {
+        public static string GetName(AlgorithmType type)
+        {
+            if ((AlgorithmType.INVALID <= type && type <= AlgorithmType.Lyra2z) ||
+                (AlgorithmType.DaggerKeccak <= type && type <= AlgorithmType.DaggerPascal))
+            {
                 return Enum.GetName(typeof(AlgorithmType), type);
             }
             return "NameNotFound type not supported";
