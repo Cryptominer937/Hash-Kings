@@ -92,6 +92,7 @@ namespace NiceHashMiner.Miners.Grouping
             public const string Sgminer560General = Bin + @"\sgminer-5-6-0-general\sgminer.exe";
 
             public const string SgminerGm = Bin + @"\sgminer-gm\sgminer.exe";
+            public const string SgminerKl = Bin + @"\sgminer-kl\sgminer.exe";
 
             public const string NhEqMiner = Bin + @"\nheqminer_v0.4b\NhEqMiner.exe";
             public const string Excavator = Bin + @"\excavator\excavator.exe";
@@ -103,6 +104,7 @@ namespace NiceHashMiner.Miners.Grouping
             public const string XmrStakHeavy = Bin + @"\xmr-stak_heavy\xmr-stak.exe";
 
             public const string CpuMiner = Bin + @"\cpuminer_opt\cpuminer.exe";
+            public const string lyclMiner = Bin + @"\lyclMiner\lyclMiner.exe";
 
             public const string None = "";
 
@@ -119,6 +121,8 @@ namespace NiceHashMiner.Miners.Grouping
             public const string Dstm = Bin3rdParty + @"\dstm\zm.exe";
             public const string CastXMR = Bin3rdParty + @"\castxmr\cast_xmr-vega.exe";
             public const string hsrneoscrypt = Bin3rdParty + @"\hsrminer_neoscrypt\hsrminer_neoscrypt.exe";
+            public const string CryptoDredge = Bin3rdParty + @"\CryptoDredge\CryptoDredge.exe";
+            public const string ZEnemy = Bin3rdParty + @"\Z-Enemy\z-enemy.exe";
         }
 
         // NEW START
@@ -184,8 +188,14 @@ namespace NiceHashMiner.Miners.Grouping
                     return Data.CpuMiner;
                 case MinerBaseType.CastXMR:
                     return Data.CastXMR;
+                case MinerBaseType.lyclMiner:
+                    return Data.lyclMiner;
                 case MinerBaseType.hsrneoscrypt:
                     return NvidiaGroups.hsrneoscrypt_path(algoType, devGroupType);
+                case MinerBaseType.CryptoDredge:
+                    return NvidiaGroups.CryptoDredge(algoType, devGroupType);
+                case MinerBaseType.ZEnemy:
+                    return NvidiaGroups.ZEnemy(algoType, devGroupType);
             }
             return Data.None;
         }
@@ -295,6 +305,38 @@ namespace NiceHashMiner.Miners.Grouping
                 return Data.None; // should not happen
             }
 
+            public static string CryptoDredge(AlgorithmType algorithmType, DeviceGroupType nvidiaGroup)
+            {
+                // sm21 and sm3x have same settings
+                if (nvidiaGroup == DeviceGroupType.NVIDIA_2_1 || nvidiaGroup == DeviceGroupType.NVIDIA_3_x)
+                {
+                    return Data.CryptoDredge;
+                }
+                // sm5x and sm6x have same settings otherwise
+                if (nvidiaGroup == DeviceGroupType.NVIDIA_5_x || nvidiaGroup == DeviceGroupType.NVIDIA_6_x)
+                {
+                    return Data.CryptoDredge; ;
+                }
+                // TODO wrong case?
+                return Data.None; // should not happen
+            }
+
+            public static string ZEnemy(AlgorithmType algorithmType, DeviceGroupType nvidiaGroup)
+            {
+                // sm21 and sm3x have same settings
+                if (nvidiaGroup == DeviceGroupType.NVIDIA_2_1 || nvidiaGroup == DeviceGroupType.NVIDIA_3_x)
+                {
+                    return Data.ZEnemy;
+                }
+                // sm5x and sm6x have same settings otherwise
+                if (nvidiaGroup == DeviceGroupType.NVIDIA_5_x || nvidiaGroup == DeviceGroupType.NVIDIA_6_x)
+                {
+                    return Data.ZEnemy; ;
+                }
+                // TODO wrong case?
+                return Data.None; // should not happen
+            }
+
 
             public static string Ccminer_path(AlgorithmType algorithmType, DeviceGroupType nvidiaGroup)
             {
@@ -332,6 +374,10 @@ namespace NiceHashMiner.Miners.Grouping
         {
             public static string SgminerPath(AlgorithmType type)
             {
+                if (AlgorithmType.X16R == type)
+                {
+                    return Data.SgminerKl;
+                }
                 if (AlgorithmType.CryptoNight == type || AlgorithmType.DaggerHashimoto == type)
                 {
                     return Data.SgminerGm;
@@ -361,6 +407,14 @@ namespace NiceHashMiner.Miners.Grouping
                     return Data.CastXMR;
                 }
                 return Data.CastXMR;
+            }
+            public static string lyclMiner(AlgorithmType algorithmType)
+            {
+                if (AlgorithmType.Lyra2REv2 == algorithmType )
+                {
+                    return Data.lyclMiner;
+                }
+                return Data.lyclMiner;
             }
         }
 

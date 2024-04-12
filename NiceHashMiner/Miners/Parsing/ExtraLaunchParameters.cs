@@ -32,7 +32,20 @@ namespace NiceHashMiner.Miners.Parsing
                 },
                 new List<MinerOption>()
             ),
-
+                new MinerOptionPackage(
+                MinerType.CryptoDredge,
+                new List<MinerOption>() {
+                    new MinerOption("Intensity", "-i", "--intensity=", "0", MinerOptionFlagType.MultiParam, ",")
+                },
+                new List<MinerOption>()
+            ),
+                new MinerOptionPackage(
+                MinerType.ZEnemy,
+                new List<MinerOption>() {
+                    new MinerOption("Intensity", "-i", "--intensity=", "0", MinerOptionFlagType.MultiParam, ",")
+                },
+                new List<MinerOption>()
+            ),
             new MinerOptionPackage(
                 MinerType.ccminer_CryptoNight,
                 new List<MinerOption>
@@ -369,6 +382,14 @@ namespace NiceHashMiner.Miners.Parsing
                     new MinerOption("Log", "--log", "--log", "", MinerOptionFlagType.Uni, ""), // default none
                     new MinerOption("Intensity", "--intensity", "--intensity", "0", MinerOptionFlagType.MultiParam, " "), //maybe not work
                     new MinerOption("RateWatchdog", "--ratewatchdog", "--ratewatchdog", "", MinerOptionFlagType.Uni, "") // default none
+                },
+                new List<MinerOption>()
+                 ),
+             new MinerOptionPackage(
+                MinerType.lyclMiner,
+                new List<MinerOption>
+                {
+                    new MinerOption("Worksize", "worksize=", "worksize=", "1048576", MinerOptionFlagType.MultiParam, ","),
                 },
                 new List<MinerOption>()
                  ),

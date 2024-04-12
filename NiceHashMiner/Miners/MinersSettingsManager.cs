@@ -150,10 +150,12 @@ namespace NiceHashMiner.Miners
                     {
                         MinerPaths.Data.Sgminer560General,
                         MinerPaths.Data.SgminerGm,
+                        MinerPaths.Data.SgminerKl,
                         MinerPaths.Data.ClaymoreCryptoNightMiner,
                         MinerPaths.Data.ClaymoreZcashMiner,
                         MinerPaths.Data.OptiminerZcashMiner,
                         MinerPaths.Data.CastXMR,
+                        MinerPaths.Data.lyclMiner,
                         MinerPaths.Data.ClaymoreNeoscryptMiner
                     };
                     foreach (var minerPath in minerPaths)

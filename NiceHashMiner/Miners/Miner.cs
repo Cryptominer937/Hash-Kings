@@ -381,7 +381,7 @@ namespace NiceHashMiner
                 int i = outdata.IndexOf("Benchmark:");
                 int k = outdata.IndexOf("/s");
                 string hashspeed = outdata.Substring(i + 11, k - i - 9);
-                Helpers.ConsolePrint("BENCHMARK", "Final Speed: " + hashspeed);
+                Helpers.ConsolePrint("BENCHMARK-NS", "Final Speed: " + hashspeed);
 
                 // save speed
                 int b = hashspeed.IndexOf(" ");
@@ -504,10 +504,63 @@ namespace NiceHashMiner
             _benchmarkLogPath =
                 $"{Logger.LogPath}Log_{MiningSetup.MiningPairs[0].Device.Uuid}_{MiningSetup.MiningPairs[0].Algorithm.AlgorithmStringID}";
 
+            /*
+            if (MiningSetup.CurrentAlgorithmType.Equals(AlgorithmType.Lyra2REv2) & this is lyclMiner)
+            {
+                Helpers.ConsolePrint("lyclMiner", "Start config generating");
+                var benchmarkconfigHandle = new Process
+                {
+                    StartInfo =
+                {
+                    FileName = MiningSetup.MinerPath
+                }
+                };
+
+
+                // sgminer quickfix
+                if (this is Sgminer)
+                {
+                    BenchmarkProcessPath = "cmd / " + benchmarkconfigHandle.StartInfo.FileName;
+                    benchmarkconfigHandle.StartInfo.FileName = "cmd";
+                }
+                else
+                {
+                    BenchmarkProcessPath = benchmarkconfigHandle.StartInfo.FileName;
+                    Helpers.ConsolePrint(MinerTag(), "Using miner: " + benchmarkconfigHandle.StartInfo.FileName);
+                    benchmarkconfigHandle.StartInfo.WorkingDirectory = WorkingDirectory;
+                }
+
+                // set sys variables
+                if (MinersSettingsManager.MinerSystemVariables.ContainsKey(Path))
+                {
+                    foreach (var kvp in MinersSettingsManager.MinerSystemVariables[Path])
+                    {
+                        var envName = kvp.Key;
+                        var envValue = kvp.Value;
+                        benchmarkconfigHandle.StartInfo.EnvironmentVariables[envName] = envValue;
+                    }
+                }
+
+                benchmarkconfigHandle.StartInfo.Arguments = " -g lyclMiner.conf";
+                benchmarkconfigHandle.StartInfo.UseShellExecute = false;
+                benchmarkconfigHandle.StartInfo.RedirectStandardError = true;
+                benchmarkconfigHandle.StartInfo.RedirectStandardOutput = false;
+                benchmarkconfigHandle.StartInfo.CreateNoWindow = true;
+                //benchmarkHandle.OutputDataReceived += BenchmarkOutputErrorDataReceived;
+                //benchmarkHandle.ErrorDataReceived += BenchmarkOutputErrorDataReceived;
+                //benchmarkHandle.Exited += BenchmarkHandle_Exited;
+
+                if (!benchmarkconfigHandle.Start()) return;
+                Thread.Sleep(1000);
+            }
+            */
             var commandLine = BenchmarkCreateCommandLine(BenchmarkAlgorithm, time);
 
             var benchmarkThread = new Thread(BenchmarkThreadRoutine);
+
             benchmarkThread.Start(commandLine);
+           
+
         }
 
         protected virtual Process BenchmarkStartProcess(string commandLine)
@@ -613,7 +666,7 @@ namespace NiceHashMiner
 
         protected void CheckOutdata(string outdata)
         {
-//            Helpers.ConsolePrint("BENCHMARK" , outdata);
+//            Helpers.ConsolePrint("BENCHMARK_CheckOutData" , outdata);
             BenchLines.Add(outdata);
             // ccminer, cpuminer
             if (outdata.Contains("Cuda error"))
@@ -636,7 +689,7 @@ namespace NiceHashMiner
                 BenchmarkException = new Exception("Xmr-Stak erred, check its logs");
 
             // lastly parse data
-            Helpers.ConsolePrint("BENCHMARK", outdata);
+            Helpers.ConsolePrint("BENCHMARK_CheckOutData", outdata);
             if (BenchmarkParseLine(outdata))
             {
                 BenchmarkSignalFinnished = true;
@@ -656,7 +709,7 @@ namespace NiceHashMiner
                 var i = outdata.IndexOf("Benchmark:");
                 var k = outdata.IndexOf("/s");
                 var hashspeed = outdata.Substring(i + 11, k - i - 9);
-                Helpers.ConsolePrint("BENCHMARK", "Final Speed: " + hashspeed);
+                Helpers.ConsolePrint("BENCHMARK-CC", "Final Speed: " + hashspeed);
 
                 // save speed
                 var b = hashspeed.IndexOf(" ");
@@ -697,7 +750,7 @@ namespace NiceHashMiner
                 BenchmarkProcessStatus = BenchmarkProcessStatus.Killing;
                 try
                 {
-                    Helpers.ConsolePrint("BENCHMARK",
+                    Helpers.ConsolePrint("BENCHMARK-end",
                         $"Trying to kill benchmark process {BenchmarkProcessPath} algorithm {BenchmarkAlgorithm.AlgorithmName}");
                     BenchmarkHandle.Kill();
                     BenchmarkHandle.Close();
@@ -707,7 +760,7 @@ namespace NiceHashMiner
                 finally
                 {
                     BenchmarkProcessStatus = BenchmarkProcessStatus.DoneKilling;
-                    Helpers.ConsolePrint("BENCHMARK",
+                    Helpers.ConsolePrint("BENCHMARK-end",
                         $"Benchmark process {BenchmarkProcessPath} algorithm {BenchmarkAlgorithm.AlgorithmName} KILLED");
                     //BenchmarkHandle = null;
                 }
@@ -767,19 +820,19 @@ namespace NiceHashMiner
                 if (!dualAlg.TuningEnabled)
                 {
                     // Tuning will report speed
-                    Helpers.ConsolePrint("BENCHMARK",
+                    Helpers.ConsolePrint("BENCHMARK-finish",
                         "Final Speed: " + Helpers.FormatDualSpeedOutput(dualAlg.BenchmarkSpeed,
                             dualAlg.SecondaryBenchmarkSpeed, dualAlg.DualNiceHashID));
                 }
             }
             else
             {
-                Helpers.ConsolePrint("BENCHMARK",
+                Helpers.ConsolePrint("BENCHMARK-finish",
                     "Final Speed: " + Helpers.FormatDualSpeedOutput(BenchmarkAlgorithm.BenchmarkSpeed, 0,
                         BenchmarkAlgorithm.NiceHashID));
             }
 
-            Helpers.ConsolePrint("BENCHMARK", "Benchmark ends");
+            Helpers.ConsolePrint("BENCHMARK-finish", "Benchmark ends");
             if (BenchmarkComunicator != null && !OnBenchmarkCompleteCalled)
             {
                 OnBenchmarkCompleteCalled = true;
@@ -801,7 +854,7 @@ namespace NiceHashMiner
 
             try
             {
-                Helpers.ConsolePrint("BENCHMARK", "Benchmark starts");
+                Helpers.ConsolePrint("BENCHMARK-routine", "Benchmark starts");
                 BenchmarkHandle = BenchmarkStartProcess((string) commandLine);
 
                 BenchmarkThreadRoutineStartSettup();
@@ -864,7 +917,7 @@ namespace NiceHashMiner
 
             try
             {
-                Helpers.ConsolePrint("BENCHMARK", "Benchmark starts");
+                Helpers.ConsolePrint("BENCHMARK-routineAlt", "Benchmark starts");
                 Helpers.ConsolePrint(MinerTag(), "Benchmark should end in : " + benchmarkTimeWait + " seconds");
                 BenchmarkHandle = BenchmarkStartProcess((string) commandLine);
                 BenchmarkHandle.WaitForExit(benchmarkTimeWait + 2);
@@ -1298,7 +1351,6 @@ namespace NiceHashMiner
             var ad = new ApiData(MiningSetup.CurrentAlgorithmType);
 
             var dataToSend = GetHttpRequestNhmAgentStrin("summary");
-
             var resp = await GetApiDataAsync(ApiPort, dataToSend);
             if (resp == null)
             {

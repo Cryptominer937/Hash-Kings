@@ -25,6 +25,9 @@
         CastXMR,
         hsrneoscrypt,
         ClaymoreNeoscrypt,
+        CryptoDredge,
+        ZEnemy,
+        lyclMiner,
         END
     }
 }

@@ -238,7 +238,7 @@ namespace NiceHashMiner.Miners
             {
                 var stepsLeft = (int) Math.Ceiling((double) (dualBenchAlgo.TuningEnd - dualBenchAlgo.CurrentIntensity) /
                                                    (dualBenchAlgo.TuningInterval)) + 1;
-                Helpers.ConsolePrint("CDTUING", "{0} tuning steps remain, should complete in {1} seconds", stepsLeft,
+                Helpers.ConsolePrint("CDTUNING", "{0} tuning steps remain, should complete in {1} seconds", stepsLeft,
                     stepsLeft * BenchmarkTimeWait);
                 Helpers.ConsolePrint("CDTUNING",
                     $"Starting benchmark for intensity {dualBenchAlgo.CurrentIntensity} out of {dualBenchAlgo.TuningEnd}");

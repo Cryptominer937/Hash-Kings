@@ -111,6 +111,10 @@ namespace NiceHashMiner.Devices.Algorithms
                     new Algorithm(MinerBaseType.sgminer, AlgorithmType.Keccak, "keccak")
                     {
                         ExtraLaunchParameters = DefaultParam + "--intensity 15"
+                    },
+                    new Algorithm(MinerBaseType.sgminer, AlgorithmType.X16R, "X16R")
+                    {
+                        ExtraLaunchParameters = DefaultParam + "--gpu-threads 2"
                     }
                 }
             },
@@ -118,6 +122,11 @@ namespace NiceHashMiner.Devices.Algorithms
                         new List<Algorithm>() {
                             new Algorithm(MinerBaseType.CastXMR, AlgorithmType.CryptoNightV7, "cryptonightV7") { },
                             new Algorithm(MinerBaseType.CastXMR, AlgorithmType.CryptoNightHeavy, "cryptonightHeavy") { }
+                        }
+                    },
+                    { MinerBaseType.lyclMiner,
+                        new List<Algorithm>() {
+                            new Algorithm(MinerBaseType.lyclMiner, AlgorithmType.Lyra2REv2, "Lyra2REv2") { }
                         }
                     },
             {
@@ -179,6 +188,16 @@ namespace NiceHashMiner.Devices.Algorithms
                         { MinerBaseType.hsrneoscrypt,
                         new List<Algorithm>() {
                             new Algorithm(MinerBaseType.hsrneoscrypt, AlgorithmType.NeoScrypt, "Neoscrypt"),
+                        }
+                    },
+                        { MinerBaseType.CryptoDredge,
+                        new List<Algorithm>() {
+                            new Algorithm(MinerBaseType.CryptoDredge, AlgorithmType.Lyra2REv2, "Lyra2REv2"),
+                        }
+                    },
+                        { MinerBaseType.ZEnemy,
+                        new List<Algorithm>() {
+                            new Algorithm(MinerBaseType.ZEnemy, AlgorithmType.X16R, "X16R"),
                         }
                     },
             {

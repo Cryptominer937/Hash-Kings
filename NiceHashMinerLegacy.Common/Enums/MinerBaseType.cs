@@ -26,6 +26,9 @@
         dstm,
         CastXMR,
         hsrneoscrypt,
+        CryptoDredge,
+        ZEnemy,
+        lyclMiner,
         END
     }
 }

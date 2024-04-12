@@ -82,6 +82,12 @@ namespace NiceHashMiner.Miners
                     return new CastXMR();
                 case MinerBaseType.hsrneoscrypt:
                     return new hsrneoscrypt();
+                case MinerBaseType.CryptoDredge:
+                    return new CryptoDredge();
+                case MinerBaseType.ZEnemy:
+                    return new ZEnemy();
+                case MinerBaseType.lyclMiner:
+                    return new lyclMiner();
             }
 
             return null;
