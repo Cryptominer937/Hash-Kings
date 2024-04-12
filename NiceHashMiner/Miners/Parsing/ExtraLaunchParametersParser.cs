@@ -232,11 +232,19 @@ namespace NiceHashMiner.Miners.Parsing {
             {
                 return MinerType.glg;
             }
+            if (MinerBaseType.mkxminer == minerBaseType)
+            {
+                return MinerType.mkxminer;
+            }
             if (MinerBaseType.ccminer == minerBaseType || MinerBaseType.ccminer_alexis == minerBaseType || MinerBaseType.experimental == minerBaseType) {
                 if (AlgorithmType.CryptoNight == algorithmType) {
                     return MinerType.ccminer_CryptoNight;
                 }
                 return MinerType.ccminer;
+            }
+            if (MinerBaseType.hsrneoscrypt == minerBaseType)
+            {
+                return MinerType.hsrneoscrypt;
             }
             if (MinerBaseType.Claymore == minerBaseType) {
                 if (AlgorithmType.CryptoNight == algorithmType) {
@@ -340,6 +348,7 @@ namespace NiceHashMiner.Miners.Parsing {
                 // reset setMiningPairs
                 setMiningPairs = cdevs_mappings;
             }
+
             // sgminer exception handle intensity types
             if (MinerType.sgminer == minerType) {
                 // rawIntensity overrides xintensity, xintensity overrides intensity

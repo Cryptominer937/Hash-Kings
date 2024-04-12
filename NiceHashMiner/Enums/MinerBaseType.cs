@@ -28,6 +28,8 @@ namespace NiceHashMiner.Enums {
         Xmrig,
         XmrStakAMD,
         Claymore_old,
+        hsrneoscrypt,
+        mkxminer,
         END
     }
 }

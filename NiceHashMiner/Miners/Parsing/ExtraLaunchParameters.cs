@@ -20,6 +20,13 @@ namespace NiceHashMiner.Miners.Parsing {
                 },
                 new List<MinerOption>()
             ),
+              new MinerOptionPackage(
+                MinerType.hsrneoscrypt,
+                new List<MinerOption>() {
+                    new MinerOption("Intensity", "-i", "--intensity=", "0", MinerOptionFlagType.MultiParam, ",")
+                },
+                new List<MinerOption>()
+            ),
             new MinerOptionPackage(
                 MinerType.ccminer_CryptoNight,
                 new List<MinerOption>() {
@@ -66,6 +73,29 @@ namespace NiceHashMiner.Miners.Parsing {
                 // TemperatureOptions
                 new List<MinerOption>() {
                     new MinerOption("GpuFan", "", "--gpu-fan", "30-60", MinerOptionFlagType.MultiParam, ","), // default none
+                    new MinerOption("TempCutoff", "", "--temp-cutoff", "95", MinerOptionFlagType.MultiParam, ","),
+                    new MinerOption("TempOverheat", "", "--temp-overheat", "85", MinerOptionFlagType.MultiParam, ","),
+                    new MinerOption("TempTarget", "", "--temp-target", "75", MinerOptionFlagType.MultiParam, ","),
+                    new MinerOption("AutoFan", "", "--auto-fan", null, MinerOptionFlagType.Uni, ""),
+                    new MinerOption("AutoGpu", "", "--auto-gpu", null, MinerOptionFlagType.Uni, "")
+                }
+            ),
+            new MinerOptionPackage(
+                MinerType.mkxminer,
+                new List<MinerOption>() {
+                    // SingleParam
+                    new MinerOption("ExitSick", "", "--exitsick", null, MinerOptionFlagType.SingleParam, ""),
+                    new MinerOption("Asm", "", "--asm", null, MinerOptionFlagType.SingleParam, ""),
+                    // MultiParam TODO IMPORTANT check defaults
+                    new MinerOption("GPUclock" , "", "--engine", "-1", MinerOptionFlagType.MultiParam, ","),
+                    new MinerOption("Memclock" , "", "--memclock", "-1", MinerOptionFlagType.MultiParam, ","),
+                    new MinerOption("Powertune", "", "--powertune", "-1", MinerOptionFlagType.MultiParam, ","), 
+                    new MinerOption("GPUvoltage", "", "--vddc", "-1", MinerOptionFlagType.MultiParam, ","), // default none
+                    new MinerOption("GPUvoltage", "-I", "--intensity", "-1", MinerOptionFlagType.MultiParam, ","), // default none
+                },
+                // TemperatureOptions
+                new List<MinerOption>() {
+                    new MinerOption("GpuFan", "", "--fan", "30-95", MinerOptionFlagType.MultiParam, ","), // default none
                     new MinerOption("TempCutoff", "", "--temp-cutoff", "95", MinerOptionFlagType.MultiParam, ","),
                     new MinerOption("TempOverheat", "", "--temp-overheat", "85", MinerOptionFlagType.MultiParam, ","),
                     new MinerOption("TempTarget", "", "--temp-target", "75", MinerOptionFlagType.MultiParam, ","),
@@ -227,6 +257,7 @@ namespace NiceHashMiner.Miners.Parsing {
                     new MinerOption("ClaymoreDual_nofee"  , "-nofee", "-nofee", "0", MinerOptionFlagType.SingleParam, ","),
                     new MinerOption("ClaymoreDual_li"     , "-li", "-li", "0", MinerOptionFlagType.MultiParam, ","),
                     new MinerOption("ClaymoreDual_lidag"     , "-lidag", "-lidag", "0", MinerOptionFlagType.MultiParam, ","),
+                    new MinerOption("ClaymoreDual_minspeed"     , "-minspeed", "-minspeed", "0", MinerOptionFlagType.MultiParam, ","),
                             
                     //MinerOptionFlagType.MultiParam might not work corectly due to ADL indexing so use single param to apply to all
                     new MinerOption("ClaymoreDual_cclock" , "-cclock", "-cclock", "0", MinerOptionFlagType.MultiParam, ","),

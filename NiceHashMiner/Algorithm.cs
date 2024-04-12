@@ -49,7 +49,8 @@ namespace NiceHashMiner {
             ExtraLaunchParameters = "";
             LessThreads = 0;
             Enabled = !(NiceHashID == AlgorithmType.Nist5 || (NiceHashID == AlgorithmType.NeoScrypt && minerBaseType == MinerBaseType.sgminer));
-            Enabled = !(NiceHashID == AlgorithmType.Equihash) || (NiceHashID == AlgorithmType.CryptoNight) || (NiceHashID == AlgorithmType.NeoScrypt) || (NiceHashID == AlgorithmType.Keccak) && minerBaseType == MinerBaseType.GatelessGate;
+            Enabled = !(NiceHashID == AlgorithmType.Equihash) || (NiceHashID == AlgorithmType.CryptoNight) || (NiceHashID == AlgorithmType.NeoScrypt) || (NiceHashID == AlgorithmType.Keccak) && minerBaseType == MinerBaseType.GatelessGate || (NiceHashID == AlgorithmType.Lyra2REv2) && minerBaseType == MinerBaseType.GatelessGate;
+            Enabled = !(NiceHashID == AlgorithmType.Lyra2REv2) && minerBaseType == MinerBaseType.mkxminer;
             BenchmarkStatus = "";
         }
 
@@ -135,12 +136,16 @@ namespace NiceHashMiner {
                         return AlgorithmType.DaggerPascal;
                     case AlgorithmType.Sia:
                         return AlgorithmType.DaggerSia;
+                    case AlgorithmType.Blake2s:
+                        return AlgorithmType.DaggerBlake2s;
+                    case AlgorithmType.Keccak:
+                        return AlgorithmType.DaggerKeccak;
                 }
             }
             return NiceHashID;
         }
         public bool IsDual() {
-            return (AlgorithmType.DaggerSia <= DualNiceHashID() && DualNiceHashID() <= AlgorithmType.DaggerPascal);
+            return (AlgorithmType.DaggerBlake2s <= DualNiceHashID() && DualNiceHashID() <= AlgorithmType.DaggerPascal);
         }
     }
 }

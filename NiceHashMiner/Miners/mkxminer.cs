@@ -18,23 +18,27 @@ using System.Threading.Tasks;
 
 namespace NiceHashMiner.Miners
 {
-    class glg : Miner
+    class mkxminer : Miner
     {
         private readonly int GPUPlatformNumber;
         Stopwatch _benchmarkTimer = new Stopwatch();
 
-        public glg()
-            : base("glg_AMD")
+        public mkxminer()
+            : base("mkxminer_AMD")
         {
             GPUPlatformNumber = ComputeDeviceManager.Avaliable.AMDOpenCLPlatformNum;
             IsKillAllUsedMinerProcs = true;
+            IsNeverHideMiningWindow = true;
+
         }
 
         // use ONLY for exiting a benchmark
-        public void Killglg() {
-            foreach (Process process in Process.GetProcessesByName("gatelessgate")) {
+        public void Killmkxminer() {
+            /*
+            foreach (Process process in Process.GetProcessesByName("mkxminer")) {
                 try { process.Kill(); } catch (Exception e) { Helpers.ConsolePrint(MinerDeviceName, e.ToString()); }
             }
+            */
         }
 
         public override void EndBenchmarkProcces() {
@@ -42,7 +46,7 @@ namespace NiceHashMiner.Miners
                 BenchmarkProcessStatus = BenchmarkProcessStatus.Killing;
                 try {
                     Helpers.ConsolePrint("BENCHMARK", String.Format("Trying to kill benchmark process {0} algorithm {1}", BenchmarkProcessPath, BenchmarkAlgorithm.AlgorithmName));
-                    Killglg();
+                    Killmkxminer();
                 } catch { } finally {
                     BenchmarkProcessStatus = BenchmarkProcessStatus.DoneKilling;
                     Helpers.ConsolePrint("BENCHMARK", String.Format("Benchmark process {0} algorithm {1} KILLED", BenchmarkProcessPath, BenchmarkAlgorithm.AlgorithmName));
@@ -121,31 +125,37 @@ namespace NiceHashMiner.Miners
                 username += "." + ConfigManager.GeneralConfig.WorkerName.Trim();
 
             // cd to the cgminer for the process bins
-            CommandLine = " /C \"cd /d " + WorkingDirectory + " && gatelessgate.exe " +
-                          " --gpu-platform " + GPUPlatformNumber +
-                          " -k " + algorithm.MinerName +
-                          " --url=" + url + "/#xnsub" +
-                          " --userpass=" + Globals.DemoUser + 
+
+            CommandLine = " /C \"cd /d " + WorkingDirectory + " && mkxminer.exe " +
+                          " --url " + url + "/#xnsub" +
+                          " --user " + Globals.DemoUser + 
                           " -p x " +
-                          " --sched-stop " + DateTime.Now.AddSeconds(time).ToString("HH:mm") +
-                          " -T --log 10 --log-file dump.txt" +
-                          " --api-listen" +
-                          " --api-port=" + APIPort.ToString() +
-                          " " +
                           ExtraLaunchParametersParser.ParseForMiningSetup(
                                                                 MiningSetup,
                                                                 DeviceType.AMD) +
                           " --device ";
 
             CommandLine += GetDevicesCommandString();
+  //          CommandLine += " >benchmark.txt";
+            //    CommandLine += " && del dump.txt\"";
 
-            CommandLine += " && del dump.txt\"";
+/*
+            CommandLine =           " --url " + url + "/#xnsub" +
+                                    " --user " + Globals.DemoUser +
+                                    " -p x " +
+                                    ExtraLaunchParametersParser.ParseForMiningSetup(
+                                                                          MiningSetup,
+                                                                          DeviceType.AMD) +
+                                    " --device ";
 
+            CommandLine += GetDevicesCommandString();
+*/
+            // CommandLine += " >benchmark.txt";
             return CommandLine;
         }
 
         protected override bool BenchmarkParseLine(string outdata) {
-          //  Helpers.ConsolePrint("BENCHMARK", out);
+            Helpers.ConsolePrint("BENCHMARK", outdata);
             string hashSpeed = "";
             int kspeed = 1;
             if (outdata.Contains("Terminating execution as planned") )
@@ -185,19 +195,18 @@ namespace NiceHashMiner.Miners
             AlgorithmType NHDataIndex = BenchmarkAlgorithm.NiceHashID;
 
             if (Globals.NiceHashData == null) {
-                Helpers.ConsolePrint("BENCHMARK", "Skipping gatelessgate benchmark because there is no internet " +
-                    "connection. Gatelessgate needs internet connection to do benchmarking.");
+                Helpers.ConsolePrint("BENCHMARK", "Skipping mkxminer benchmark because there is no internet " +
+                    "connection. mkxminer needs internet connection to do benchmarking.");
 
                 throw new Exception("No internet connection");
             }
 
             if (Globals.NiceHashData[NHDataIndex].paying == 0) {
-                Helpers.ConsolePrint("BENCHMARK", "Skipping gatelessgate benchmark because there is no work on Nicehash.com " +
+                Helpers.ConsolePrint("BENCHMARK", "Skipping mkxminer benchmark because there is no work on Nicehash.com " +
                     "[algo: " + BenchmarkAlgorithm.AlgorithmName + "(" + NHDataIndex + ")]");
 
                 throw new Exception("No work can be used for benchmarking");
             }
-
             _benchmarkTimer.Reset();
             _benchmarkTimer.Start();
             // call base, read only outpus
@@ -207,12 +216,12 @@ namespace NiceHashMiner.Miners
         protected override void BenchmarkOutputErrorDataReceivedImpl(string outdata) {
             if (_benchmarkTimer.Elapsed.TotalSeconds >= BenchmarkTimeInSeconds) {
                 string resp = GetAPIDataAsync(APIPort, "quit").Result.TrimEnd(new char[] { (char)0 });
-                Helpers.ConsolePrint("BENCHMARK", "gatelessgate Response: " + resp);
+                Helpers.ConsolePrint("BENCHMARK", "mkxminer Response: " + resp);
             }
             if (_benchmarkTimer.Elapsed.TotalSeconds >= BenchmarkTimeInSeconds + 2) {
                 _benchmarkTimer.Stop();
                 // this is safe in a benchmark
-                Killglg();
+                Killmkxminer();
                 BenchmarkSignalHanged = true;
             }
             if (!BenchmarkSignalFinnished && outdata != null) {
@@ -222,9 +231,10 @@ namespace NiceHashMiner.Miners
 
         protected override string GetFinalBenchmarkString() {
             if (BenchmarkAlgorithm.BenchmarkSpeed <= 0) {
-                Helpers.ConsolePrint("gatelessgate_GetFinalBenchmarkString", International.GetText("gatelessgate_precise_try"));
-                return International.GetText("gatelessgate_precise_try");
+                Helpers.ConsolePrint("mkxminer_GetFinalBenchmarkString", International.GetText("mkxminer_precise_try"));
+                return International.GetText("mkxminer_precise_try");
             }
+
             return base.GetFinalBenchmarkString();
         }
 
@@ -256,7 +266,7 @@ namespace NiceHashMiner.Miners
                         || BenchmarkException != null) {
                         //EndBenchmarkProcces();
                         // this is safe in a benchmark
-                        Killglg();
+                        Killmkxminer();
                         if (BenchmarkSignalTimedout) {
                             throw new Exception("Benchmark timedout");
                         }
@@ -267,7 +277,7 @@ namespace NiceHashMiner.Miners
                             throw new Exception("Termined by user request");
                         }
                         if (BenchmarkSignalHanged) {
-                            throw new Exception("gatelessgate is not responding");
+                            throw new Exception("mkxminer is not responding");
                         }
                         if (BenchmarkSignalFinnished) {
                             break;
@@ -332,7 +342,7 @@ namespace NiceHashMiner.Miners
                     ad.Speed = Double.Parse(speed[1]) * 1000;
 
                     if (total_mh <= PreviousTotalMH) {
-                        Helpers.ConsolePrint(MinerTAG(), ProcessTag() + " gatelessgate might be stuck as no new hashes are being produced");
+                        Helpers.ConsolePrint(MinerTAG(), ProcessTag() + " mkxminer might be stuck as no new hashes are being produced");
                         Helpers.ConsolePrint(MinerTAG(), ProcessTag() + " Prev Total MH: " + PreviousTotalMH + " .. Current Total MH: " + total_mh);
                         _currentMinerReadStatus = MinerAPIReadStatus.NONE;
                         return null;

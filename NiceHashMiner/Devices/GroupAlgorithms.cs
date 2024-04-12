@@ -143,9 +143,47 @@ namespace NiceHashMiner.Devices {
                         // drivers algos issue
                         if (device.DriverDisableAlgos) {
                             //algoSettings = FilterMinerAlgos(algoSettings, new List<AlgorithmType> { AlgorithmType.NeoScrypt, AlgorithmType.Lyra2REv2 });
-                            algoSettings = FilterMinerAlgos(algoSettings, new List<AlgorithmType> { AlgorithmType.Lyra2REv2 });
+                          //  algoSettings = FilterMinerAlgos(algoSettings, new List<AlgorithmType> { AlgorithmType.Lyra2REv2 });
                         }
 
+                        if (algoSettings.ContainsKey(MinerBaseType.mkxminer))
+                        {
+                            var mkxminerAlgos = algoSettings[MinerBaseType.mkxminer];
+                            int Lyra2REv2_Index = mkxminerAlgos.FindIndex((el) => el.NiceHashID == AlgorithmType.Lyra2REv2);
+                            
+                            if (Lyra2REv2_Index > -1)
+                            {
+                                /*
+                                if (device.Codename.Contains("gfx804")) //rx550
+                                {
+                                    mkxminerAlgos[Lyra2REv2_Index].ExtraLaunchParameters = "-I 22";
+                                }
+                                if (device.Codename.Contains("Pitcairn")) //r7-370
+                                {
+                                    mkxminerAlgos[Lyra2REv2_Index].ExtraLaunchParameters = "-I 23";
+                                }
+                                if (device.Codename.Contains("Baffin")) //rx460/560
+                                {
+                                    mkxminerAlgos[Lyra2REv2_Index].ExtraLaunchParameters = "-I 23";
+                                }
+
+                                if (device.Codename.Contains("Ellesmere")) //rx570/580
+                                {
+                                    mkxminerAlgos[Lyra2REv2_Index].ExtraLaunchParameters = "-I 23";
+                                }
+
+                                if (device.Codename.Contains("Hawaii"))
+                                {
+                                    mkxminerAlgos[Lyra2REv2_Index].ExtraLaunchParameters = "-I 23";
+                                }
+                                else if (device.Name.Contains("Vega"))
+                                {
+                                    mkxminerAlgos[Lyra2REv2_Index].ExtraLaunchParameters = AmdGpuDevice.DefaultParam + "-I 23";
+                                }
+                                */
+                            }
+                            
+                        }
                         // disable by default
                         {
                             var minerBases = new List<MinerBaseType>() { MinerBaseType.ethminer, MinerBaseType.OptiminerAMD };
@@ -261,7 +299,7 @@ namespace NiceHashMiner.Devices {
                     { MinerBaseType.GatelessGate,
                         new List<Algorithm>() {
                             new Algorithm(MinerBaseType.GatelessGate, AlgorithmType.NeoScrypt, "neoscrypt") { ExtraLaunchParameters = DefaultParam + "--nfactor 10 --xintensity    2 --thread-concurrency 8192 --worksize  64 --gpu-threads 4" },
-                          //  new Algorithm(MinerBaseType.glg, AlgorithmType.Lyra2REv2,  "Lyra2REv2") { ExtraLaunchParameters = DefaultParam + "--nfactor 10 --xintensity  160 --thread-concurrency    0 --worksize  64 --gpu-threads 2" },
+                            new Algorithm(MinerBaseType.GatelessGate, AlgorithmType.Lyra2REv2,  "Lyra2REv2") { ExtraLaunchParameters = DefaultParam + "--nfactor 10 --xintensity  256 --thread-concurrency  1 --worksize  128 --gpu-threads 2" },
                             new Algorithm(MinerBaseType.GatelessGate, AlgorithmType.Equihash, "equihash"){ ExtraLaunchParameters = RemDis + "--xintensity 512 --worksize 256 --gpu-threads 2" },
                           //  new Algorithm(MinerBaseType.glg, AlgorithmType.DaggerHashimoto, "ethash") { ExtraLaunchParameters = DefaultParam + "--xintensity 512 -w 192 -g 1" },
                           //  new Algorithm(MinerBaseType.glg, AlgorithmType.Decred, "decred") { ExtraLaunchParameters = RemDis + "--gpu-threads 1 --xintensity 256 --lookup-gap 2 --worksize 64" },
@@ -272,7 +310,13 @@ namespace NiceHashMiner.Devices {
                             new Algorithm(MinerBaseType.GatelessGate, AlgorithmType.Keccak, "keccak") { ExtraLaunchParameters = DefaultParam + "--intensity 12 --gpu-threads 2" }
                         }
                     },
-
+/*
+                    { MinerBaseType.mkxminer,
+                        new List<Algorithm>() {
+                           new Algorithm(MinerBaseType.mkxminer, AlgorithmType.Lyra2REv2,  "Lyra2REv2") { ExtraLaunchParameters = "--exitsick --asm" }
+                        }
+                    },
+*/
                     { MinerBaseType.Claymore,
                         new List<Algorithm>() {
                             new Algorithm(MinerBaseType.Claymore, AlgorithmType.CryptoNight, "cryptonight"),
@@ -281,7 +325,9 @@ namespace NiceHashMiner.Devices {
                             new Algorithm(MinerBaseType.Claymore, AlgorithmType.DaggerHashimoto, "", AlgorithmType.Decred),
                             new Algorithm(MinerBaseType.Claymore, AlgorithmType.DaggerHashimoto, "", AlgorithmType.Lbry),
                             new Algorithm(MinerBaseType.Claymore, AlgorithmType.DaggerHashimoto, "", AlgorithmType.Pascal),
-                            new Algorithm(MinerBaseType.Claymore, AlgorithmType.DaggerHashimoto, "", AlgorithmType.Sia)
+                            new Algorithm(MinerBaseType.Claymore, AlgorithmType.DaggerHashimoto, "", AlgorithmType.Sia),
+                            new Algorithm(MinerBaseType.Claymore, AlgorithmType.DaggerHashimoto, "", AlgorithmType.Keccak),
+                            new Algorithm(MinerBaseType.Claymore, AlgorithmType.DaggerHashimoto, "", AlgorithmType.Blake2s)
                         }
                     },
                     { MinerBaseType.Claymore_old,
@@ -333,6 +379,11 @@ namespace NiceHashMiner.Devices {
                             new Algorithm(MinerBaseType.ccminer_alexis, AlgorithmType.Nist5, "nist5")
                         }
                     },
+                    { MinerBaseType.hsrneoscrypt,
+                        new List<Algorithm>() {
+                            new Algorithm(MinerBaseType.hsrneoscrypt, AlgorithmType.NeoScrypt, "Neoscrypt"),
+                        }
+                    },
                     { MinerBaseType.ethminer,
                         new List<Algorithm>() {
                             new Algorithm(MinerBaseType.ethminer, AlgorithmType.DaggerHashimoto, "daggerhashimoto")
@@ -365,7 +416,9 @@ namespace NiceHashMiner.Devices {
                             new Algorithm(MinerBaseType.Claymore, AlgorithmType.DaggerHashimoto, "", AlgorithmType.Decred),
                             new Algorithm(MinerBaseType.Claymore, AlgorithmType.DaggerHashimoto, "", AlgorithmType.Lbry),
                             new Algorithm(MinerBaseType.Claymore, AlgorithmType.DaggerHashimoto, "", AlgorithmType.Pascal),
-                            new Algorithm(MinerBaseType.Claymore, AlgorithmType.DaggerHashimoto, "", AlgorithmType.Sia)
+                            new Algorithm(MinerBaseType.Claymore, AlgorithmType.DaggerHashimoto, "", AlgorithmType.Sia),
+                            new Algorithm(MinerBaseType.Claymore, AlgorithmType.DaggerHashimoto, "", AlgorithmType.Keccak),
+                            new Algorithm(MinerBaseType.Claymore, AlgorithmType.DaggerHashimoto, "", AlgorithmType.Blake2s)
                         }
                     }
                 };

@@ -25,6 +25,8 @@ namespace NiceHashMiner.Enums {
         EWBF,
         DSTM,
         Xmrig,
+        hsrneoscrypt,
+        mkxminer,
         END
     }
 }

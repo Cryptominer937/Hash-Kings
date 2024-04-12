@@ -104,7 +104,9 @@ namespace NiceHashMiner.Miners.Grouping
             public const string ClaymoreDual = _bin_3rdparty + @"\claymore_dual\EthDcrMiner64.exe";
             public const string EWBF = _bin_3rdparty + @"\ewbf\miner.exe";
             public const string DSTM = _bin_3rdparty + @"\dstm\zm.exe";
+            public const string hsrneoscrypt = _bin_3rdparty + @"\hsrminer_neoscrypt\hsrminer_neoscrypt.exe";
             public const string prospector = _bin_3rdparty + @"\prospector\prospector.exe";
+            public const string mkxminer = _bin_3rdparty + @"\mkxminer\mkxminer.exe";
         }
 
         // NEW START
@@ -163,6 +165,10 @@ namespace NiceHashMiner.Miners.Grouping
                     return Data.XmrStakAMD;
                 case MinerBaseType.Claymore_old:
                     return Data.ClaymoreCryptoNightMiner_old;
+                case MinerBaseType.hsrneoscrypt:
+                    return NVIDIA_GROUPS.hsrneoscrypt_path(algoType, devGroupType);
+                case MinerBaseType.mkxminer:
+                    return Data.mkxminer;
             }
             return Data.NONE;
         }
@@ -223,9 +229,12 @@ namespace NiceHashMiner.Miners.Grouping
                 if (AlgorithmType.Lbry == algorithmType 
                     || AlgorithmType.X11Gost == algorithmType 
                     || AlgorithmType.Blake2s == algorithmType
-                    || AlgorithmType.Skunk == algorithmType
-                    || AlgorithmType.NeoScrypt == algorithmType) {
+                    || AlgorithmType.Skunk == algorithmType) {
                     return Data.ccminer_tpruvot;
+                }
+                if (AlgorithmType.NeoScrypt == algorithmType)
+                {
+                    return Data.ccminer_klaust;
                 }
                 if (AlgorithmType.Sia == algorithmType
                     || AlgorithmType.Nist5 == algorithmType) {
@@ -233,6 +242,27 @@ namespace NiceHashMiner.Miners.Grouping
                 }
 
                 return Data.ccminer_sp;
+            }
+
+            public static string hsrneoscrypt_path(AlgorithmType algorithmType, DeviceGroupType nvidiaGroup)
+            {
+                // sm21 and sm3x have same settings
+                if (nvidiaGroup == DeviceGroupType.NVIDIA_2_1 || nvidiaGroup == DeviceGroupType.NVIDIA_3_x)
+                {
+                    return Data.hsrneoscrypt;
+                }
+                // CN exception
+                if (nvidiaGroup == DeviceGroupType.NVIDIA_6_x && algorithmType == AlgorithmType.CryptoNight)
+                {
+                    return Data.hsrneoscrypt;
+                }
+                // sm5x and sm6x have same settings otherwise
+                if (nvidiaGroup == DeviceGroupType.NVIDIA_5_x || nvidiaGroup == DeviceGroupType.NVIDIA_6_x)
+                {
+                    return Data.hsrneoscrypt; ;
+                }
+                // TODO wrong case?
+                return Data.NONE; // should not happen
             }
             public static string ccminer_path(AlgorithmType algorithmType, DeviceGroupType nvidiaGroup) {
                 // sm21 and sm3x have same settings
@@ -273,7 +303,7 @@ namespace NiceHashMiner.Miners.Grouping
             public static string glg_path(AlgorithmType type)
             {
                 // AlgorithmType.Pascal == type || AlgorithmType.DaggerHashimoto == type || AlgorithmType.Decred == type || AlgorithmType.Lbry == type || AlgorithmType.X11Gost == type || AlgorithmType.DaggerHashimoto == type
-                if (AlgorithmType.CryptoNight == type || AlgorithmType.Equihash == type || AlgorithmType.NeoScrypt == type || AlgorithmType.Keccak == type)
+                if (AlgorithmType.CryptoNight == type || AlgorithmType.Equihash == type || AlgorithmType.NeoScrypt == type || AlgorithmType.Keccak == type || AlgorithmType.Lyra2REv2 == type)
                 {
                     return Data.glg;
                 }
