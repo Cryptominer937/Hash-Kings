@@ -137,13 +137,24 @@ namespace NiceHashMiner
 
                     ConfigManager.GeneralConfig.ForkFixVersion = 8;
                 }
-                if (Configs.ConfigManager.GeneralConfig.ForkFixVersion < 8.1)
+                if (Configs.ConfigManager.GeneralConfig.ForkFixVersion < 8.2)
                 {
                     Helpers.ConsolePrint("NICEHASH", "Old version");
                     if (Directory.Exists("internals"))
                         Directory.Delete("internals", true);
 
-                    ConfigManager.GeneralConfig.ForkFixVersion = 8.1;
+                    ConfigManager.GeneralConfig.ForkFixVersion = 8.2;
+                }
+                if (Configs.ConfigManager.GeneralConfig.ForkFixVersion < 9)
+                {
+                    Helpers.ConsolePrint("NICEHASH", "Old version");
+                    if (Directory.Exists("internals"))
+                        Directory.Delete("internals", true);
+
+                    if (File.Exists("bin\\xmrig\\xmrig.exe"))
+                        File.Delete("bin\\xmrig\\xmrig.exe");
+
+                    ConfigManager.GeneralConfig.ForkFixVersion = 9;
                 }
                 //**
 

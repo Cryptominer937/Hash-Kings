@@ -56,6 +56,46 @@ namespace NiceHashMiner.Devices.Algorithms
                     }
                 }
 
+                if (algoSettings.ContainsKey(MinerBaseType.XmrigAMD))
+                {
+                    var XmrigAMDAlgos = algoSettings[MinerBaseType.XmrigAMD];
+                    int xmrigCryptoNight_Index = XmrigAMDAlgos.FindIndex((el) => el.NiceHashID == AlgorithmType.CryptoNightV7);
+
+                    //--opencl-launch=
+                    XmrigAMDAlgos[xmrigCryptoNight_Index].ExtraLaunchParameters =" --opencl-launch=1024";
+                    if (xmrigCryptoNight_Index > -1)
+                    {
+                        if (device.Codename.Contains("gfx804")) //rx550
+                        {
+                            XmrigAMDAlgos[xmrigCryptoNight_Index].ExtraLaunchParameters = " --opencl-launch=512";
+                        }
+                        if (device.Codename.Contains("Pitcairn")) //r7-370
+                        {
+                            XmrigAMDAlgos[xmrigCryptoNight_Index].ExtraLaunchParameters = " --opencl-launch=1400";
+                        }
+                        if (device.Codename.Contains("Baffin")) //rx460/560
+                        {
+                            XmrigAMDAlgos[xmrigCryptoNight_Index].ExtraLaunchParameters = " --opencl-launch=1920";
+                        }
+
+                        if (device.Codename.Contains("Ellesmere")) //rx570/580
+                        {
+                            XmrigAMDAlgos[xmrigCryptoNight_Index].ExtraLaunchParameters = " --opencl-launch=1920";
+                        }
+
+                        if (device.Codename.Contains("Hawaii"))
+                        {
+                            XmrigAMDAlgos[xmrigCryptoNight_Index].ExtraLaunchParameters = " --opencl-launch=1024";
+                        }
+                        else if (device.Name.Contains("Vega"))
+                        {
+                            XmrigAMDAlgos[xmrigCryptoNight_Index].ExtraLaunchParameters = " --opencl-launch=1920";
+                        }
+                    }
+
+                }
+
+
                 // Ellesmere, Polaris
                 // Ellesmere sgminer workaround, keep this until sgminer is fixed to work with Ellesmere
                 if (device.Codename.Contains("Ellesmere") || device.InfSection.ToLower().Contains("polaris"))
@@ -128,12 +168,12 @@ namespace NiceHashMiner.Devices.Algorithms
                 {
                     algoSettings = FilterMinerAlgos(algoSettings, new List<AlgorithmType>
                     {
-                       // AlgorithmType.NeoScrypt,
-                       // AlgorithmType.Lyra2REv2
+                     //   AlgorithmType.NeoScrypt,
+                     //   AlgorithmType.Lyra2REv2
                     });
                 }
 
-                // disable another gpu 
+                // disable another gpu
                 //Helpers.ConsolePrint("GPU device", "Name: "+device.Name);
                 if (algoSettings.ContainsKey(MinerBaseType.CastXMR) && (!device.Name.Contains("470")
                     && !device.Name.Contains("480") && !device.Name.Contains("570") && !device.Name.Contains("580") &&
@@ -146,7 +186,7 @@ namespace NiceHashMiner.Devices.Algorithms
                     });
                 }
 
-                
+
                 // disable by default
                 {
                     var minerBases = new List<MinerBaseType>

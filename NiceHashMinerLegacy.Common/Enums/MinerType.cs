@@ -21,6 +21,7 @@
         ClaymoreDual,
         EWBF,
         Xmrig,
+        XmrigAMD,
         dstm,
         CastXMR,
         hsrneoscrypt,
@@ -29,6 +30,8 @@
         ZEnemy,
         lyclMiner,
         trex,
+        mkxminer,
+        Phoenix,
         END
     }
 }

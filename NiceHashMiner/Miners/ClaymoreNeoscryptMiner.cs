@@ -52,7 +52,6 @@ namespace NiceHashMiner.Miners {
             w.WriteAsync(epools);
             w.Flush();
             w.Close();
-
             ProcessHandle = _Start();
         }
 

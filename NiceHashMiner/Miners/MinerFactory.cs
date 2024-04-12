@@ -74,6 +74,8 @@ namespace NiceHashMiner.Miners
                     return new Prospector();
                 case MinerBaseType.Xmrig:
                     return new Xmrig();
+                case MinerBaseType.XmrigAMD:
+                    return new XmrigAMD();
                 case MinerBaseType.dstm:
                     return new Dstm();
                 case MinerBaseType.cpuminer:
@@ -90,6 +92,10 @@ namespace NiceHashMiner.Miners
                     return new lyclMiner();
                 case MinerBaseType.trex:
                     return new trex();
+                case MinerBaseType.mkxminer:
+                    return new mkxminer();
+                case MinerBaseType.Phoenix:
+                    return new Phoenix();
             }
 
             return null;

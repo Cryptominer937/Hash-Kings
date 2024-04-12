@@ -58,10 +58,31 @@ namespace NiceHashMiner.Miners
             var dual = AlgorithmType.NONE;
             string poolport = "3354";
             var dualModeParams = "";
+            string epoolsFile = "";
+            string dpoolsFile = "";
+
+            foreach (var pair in MiningSetup.MiningPairs)
+            {
+                if (pair.Device.DeviceType == DeviceType.NVIDIA)
+                {
+                    epoolsFile = "epoolsNV" + GetLogFileName().Replace("_log", "");
+                    dpoolsFile = "dpoolsNV" + GetLogFileName().Replace("_log", "");
+                } else
+                {
+                    epoolsFile = "epoolsAMD" + GetLogFileName().Replace("_log", "");
+                    dpoolsFile = "dpoolsAMD" + GetLogFileName().Replace("_log", "");
+                }
+            }
+
             if (File.Exists("bin_3rdparty\\claymore_dual\\epools.txt"))
                 File.Delete("bin_3rdparty\\claymore_dual\\epools.txt");
             if (File.Exists("bin_3rdparty\\claymore_dual\\dpools.txt"))
                 File.Delete("bin_3rdparty\\claymore_dual\\dpools.txt");
+
+            if (File.Exists("bin_3rdparty\\claymore_dual\\"+ epoolsFile))
+                File.Delete("bin_3rdparty\\claymore_dual\\"+ epoolsFile);
+            if (File.Exists("bin_3rdparty\\claymore_dual\\" + dpoolsFile))
+                File.Delete("bin_3rdparty\\claymore_dual\\" + dpoolsFile);
 
             Thread.Sleep(200);
 
@@ -73,7 +94,7 @@ namespace NiceHashMiner.Miners
                + String.Format("POOL: daggerhashimoto.eu.nicehash.com:3353, WALLET: {1}, PSW: x, ESM: 3, ALLPOOLS: 1", url, username) + "\n";
             try
             {
-                FileStream fs = new FileStream("bin_3rdparty\\claymore_dual\\epools.txt", FileMode.Create, FileAccess.Write);
+                FileStream fs = new FileStream("bin_3rdparty\\claymore_dual\\"+ epoolsFile, FileMode.Create, FileAccess.Write);
                 StreamWriter w = new StreamWriter(fs);
                 w.WriteAsync(epools);
                 w.Flush();
@@ -84,8 +105,20 @@ namespace NiceHashMiner.Miners
                 Helpers.ConsolePrint("GetStartCommand", e.ToString());
             }
 
-           
-            Thread.Sleep(200);
+            bool istuned = false;
+
+            foreach (var mPair in MiningSetup.MiningPairs)
+            {
+                if (mPair.Algorithm is DualAlgorithm algo && algo.TuningEnabled)
+                {
+                   // var intensity = algo.MostProfitableIntensity;
+                   // if (intensity < 0) intensity = defaultIntensity;
+                    istuned = true;
+                }
+            }
+
+
+                Thread.Sleep(200);
             if (!IsDual())
             {
                 // leave convenience param for non-dual entry
@@ -139,7 +172,7 @@ namespace NiceHashMiner.Miners
                  + "POOL: stratum+tcp://" + SecondaryAlgorithmType.ToString().ToLower() + ".eu.nicehash.com:" + poolport + String.Format(", WALLET: {0}, PSW: x", username) + "\n";
                 try
                 {
-                    FileStream fs1 = new FileStream("bin_3rdparty\\claymore_dual\\dpools.txt", FileMode.Create, FileAccess.Write);
+                    FileStream fs1 = new FileStream("bin_3rdparty\\claymore_dual\\"+dpoolsFile, FileMode.Create, FileAccess.Write);
                     StreamWriter w1 = new StreamWriter(fs1);
                     w1.WriteAsync(dpools);
                     w1.Flush();
@@ -153,7 +186,7 @@ namespace NiceHashMiner.Miners
 
                 var urlSecond = Globals.GetLocationUrl(SecondaryAlgorithmType,
                     Globals.MiningLocation[ConfigManager.GeneralConfig.ServiceLocation], ConectionType);
-                dualModeParams = $" -dcoin {SecondaryShortName()} -dpool {urlSecond} -dwal {username} -dpsw x";
+                dualModeParams = $" -dcoin {SecondaryShortName()} -dpool {urlSecond} -dwal {username} -dpsw x -dpoolsfile "+dpoolsFile;
             }
 
 
@@ -168,6 +201,22 @@ namespace NiceHashMiner.Miners
                 {
                     needdcri = false;
                 }
+
+
+                if (pair.Algorithm is DualAlgorithm algo && algo.TuningEnabled && pair.CurrentExtraLaunchParameters.Contains("-dcri"))
+                {
+                    if (btcAdress == Globals.DemoUser)
+                    {
+                        algo.TuningEnabled = true;
+                        Helpers.ConsolePrint("Tuning ENABLE ", "");
+                    }
+                    else
+                    {
+                        algo.TuningEnabled = false;
+                        Helpers.ConsolePrint("Tuning DISABLE ", "");
+                    }
+                }
+
                 if (pair.Device.DeviceType == DeviceType.NVIDIA)
                 {
                     isNvidia = true;
@@ -179,7 +228,8 @@ namespace NiceHashMiner.Miners
 
 
 
-            if (SecondaryAlgorithmType == AlgorithmType.Blake2s && needdcri)
+
+            if (SecondaryAlgorithmType == AlgorithmType.Blake2s & needdcri & !istuned)
             {
                 if (isNvidia)
                 {
@@ -191,10 +241,10 @@ namespace NiceHashMiner.Miners
                 }
                 addParam = " "
                     + GetDevicesCommandString()
-                    + String.Format("  -epool {0} -ewal {1} -mport 127.0.0.1:{2} -esm 3 -epsw x -allpools 1 -ftime 10 -retrydelay 5 " + dcri + " ", url, username, ApiPort)
+                    + String.Format("  -epool {0} -ewal {1} -mport 127.0.0.1:-{2} -esm 3 -epsw x -allpools 1 -ftime 10 -retrydelay 5 " + dcri + " ", url, username, ApiPort)
                     + dualModeParams;
             }
-            else if (SecondaryAlgorithmType == AlgorithmType.Keccak && needdcri )
+            else if (SecondaryAlgorithmType == AlgorithmType.Keccak & needdcri & !istuned)
             {
                 if (isNvidia)
                 {
@@ -206,7 +256,7 @@ namespace NiceHashMiner.Miners
 
                 addParam = " "
                                     + GetDevicesCommandString()
-                                    + String.Format("  -epool {0} -ewal {1} -mport 127.0.0.1:{2} -esm 3 -epsw x -allpools 1 -ftime 10 -retrydelay 5 " +dcri+ " ", url, username, ApiPort)
+                                    + String.Format("  -epool {0} -ewal {1} -mport 127.0.0.1:-{2} -esm 3 -epsw x -allpools 1 -ftime 10 -retrydelay 5 " +dcri+ " ", url, username, ApiPort)
                                     + dualModeParams;
             }
             else
@@ -214,10 +264,10 @@ namespace NiceHashMiner.Miners
 
             addParam = " "
                                     + GetDevicesCommandString()
-                                    + String.Format("  -epool {0} -ewal {1} -mport 127.0.0.1:{2} -esm 3 -epsw x -allpools 1 -ftime 10 -retrydelay 5", url, username, ApiPort)
+                                    + String.Format("  -epool {0} -ewal {1} -mport 127.0.0.1:-{2} -esm 3 -epsw x -allpools 1 -ftime 10 -retrydelay 5", url, username, ApiPort)
                                     + dualModeParams;
             }
-            return addParam;
+            return addParam + " -epoolsfile "+epoolsFile;
 /*
             return " "
                    + GetDevicesCommandString()
@@ -228,6 +278,7 @@ namespace NiceHashMiner.Miners
 
         public override void Start(string url, string btcAdress, string worker)
         {
+            var strdual = "";
             // Update to most profitable intensity
             foreach (var mPair in MiningSetup.MiningPairs)
             {
@@ -240,6 +291,28 @@ namespace NiceHashMiner.Miners
             }
 
             LastCommandLine = GetStartCommand(url, btcAdress, worker) + " -dbg -1";
+            /*
+            if (IsDual())
+            {
+                strdual = "DUAL";
+            }
+
+            foreach (var pair in MiningSetup.MiningPairs)
+            {
+                if (pair.Device.DeviceType == DeviceType.NVIDIA)
+                {
+                    RunCMDBeforeMining("NVIDIA" + " " + strdual, true);
+                }
+                else if (pair.Device.DeviceType == DeviceType.AMD)
+                {
+                    RunCMDBeforeMining("AMD" + " " + strdual, true);
+                }
+                else if (pair.Device.DeviceType == DeviceType.CPU)
+                {
+                    RunCMDBeforeMining("CPU", true);
+                }
+            }
+*/
             ProcessHandle = _Start();
         }
 

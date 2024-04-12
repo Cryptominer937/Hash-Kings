@@ -115,6 +115,29 @@ namespace NiceHashMiner.Miners.Parsing
                 }
             ),
             new MinerOptionPackage(
+                MinerType.mkxminer,
+                new List<MinerOption>() {
+                    // SingleParam
+                    new MinerOption("ExitSick", "", "--exitsick", null, MinerOptionFlagType.SingleParam, ""),
+                    new MinerOption("Asm", "", "--asm", null, MinerOptionFlagType.SingleParam, ""),
+                    // MultiParam TODO IMPORTANT check defaults
+                    new MinerOption("GPUclock" , "", "--engine", "-1", MinerOptionFlagType.MultiParam, ","),
+                    new MinerOption("Memclock" , "", "--memclock", "-1", MinerOptionFlagType.MultiParam, ","),
+                    new MinerOption("Powertune", "", "--powertune", "-1", MinerOptionFlagType.MultiParam, ","),
+                    new MinerOption("GPUvoltage", "", "--vddc", "-1", MinerOptionFlagType.MultiParam, ","), // default none
+                    new MinerOption("GPUvoltage", "-I", "--intensity", "-1", MinerOptionFlagType.MultiParam, ","), // default none
+                },
+                // TemperatureOptions
+                new List<MinerOption>() {
+                    new MinerOption("GpuFan", "", "--fan", "30-95", MinerOptionFlagType.MultiParam, ","), // default none
+                    new MinerOption("TempCutoff", "", "--temp-cutoff", "95", MinerOptionFlagType.MultiParam, ","),
+                    new MinerOption("TempOverheat", "", "--temp-overheat", "85", MinerOptionFlagType.MultiParam, ","),
+                    new MinerOption("TempTarget", "", "--temp-target", "75", MinerOptionFlagType.MultiParam, ","),
+                    new MinerOption("AutoFan", "", "--auto-fan", null, MinerOptionFlagType.Uni, ""),
+                    new MinerOption("AutoGpu", "", "--auto-gpu", null, MinerOptionFlagType.Uni, "")
+                }
+            ),
+            new MinerOptionPackage(
                 MinerType.cpuminer_opt,
                 new List<MinerOption>
                 {
@@ -264,6 +287,18 @@ namespace NiceHashMiner.Miners.Parsing
                     new MinerOption("ClaymoreCryptoNight_fanmin", "-fanmin", "-fanmin", "0", MinerOptionFlagType.MultiParam, ","),
                 }
             ),
+                new MinerOptionPackage(
+                MinerType.XmrigAMD,
+                new List<MinerOption>() {
+                    new MinerOption("Xmrig_fee", "--donate-level=", "0", MinerOptionFlagType.SingleParam, " "),
+                    new MinerOption("Xmrig_variant", "--variant=", null, MinerOptionFlagType.Uni, " "),
+                    new MinerOption("Xmrig_keepalive", "--keepalive", null, MinerOptionFlagType.Uni, " "),
+                    new MinerOption("Xmrig_affinity", "--opencl-affinity=", null, MinerOptionFlagType.SingleParam, ","),
+                    new MinerOption("Xmrig-intensity", "--opencl-launch=", null, MinerOptionFlagType.MultiParam, ","),
+                    new MinerOption("Xmrig_nocolor", "--no-color", null, MinerOptionFlagType.Uni, " ")
+                },
+                new List<MinerOption>(){ }
+             ),
             new MinerOptionPackage(
                 MinerType.OptiminerZcash,
                 new List<MinerOption>
@@ -346,6 +381,35 @@ namespace NiceHashMiner.Miners.Parsing
                     new MinerOption("ClaymoreDual_fanmax", "-fanmax", "-fanmax", "100", MinerOptionFlagType.MultiParam, ","),
                     new MinerOption("ClaymoreDual_fanmin", "-fanmin", "-fanmin", "0", MinerOptionFlagType.MultiParam, ","),
                 }
+            ),
+            new MinerOptionPackage(
+                MinerType.Phoenix,
+                new List<MinerOption>
+                {
+                    new MinerOption("Phoenix_stales", "-stales", "-stales", "1", MinerOptionFlagType.SingleParam, ","),
+                    new MinerOption("Phoenix_ftimeout", "-ftimeout", "-ftimeout", "", MinerOptionFlagType.SingleParam, ","),
+                    new MinerOption("Phoenix_AMD", "-amd", "-amd", "", MinerOptionFlagType.SingleParam, ","),
+                    new MinerOption("Phoenix_NVIDIA", "-nvidia", "-nvidia", "", MinerOptionFlagType.SingleParam, ","),
+                    new MinerOption("Phoenix_acm", "-acm", "-acm", "", MinerOptionFlagType.SingleParam, ","),
+                    new MinerOption("Phoenix_mi", "-mi", "-mi", "12", MinerOptionFlagType.MultiParam, ","),
+                    new MinerOption("Phoenix_gt", "-gt", "-gt", "15", MinerOptionFlagType.MultiParam, ","),
+                    new MinerOption("Phoenix_clKernel", "-clKernel", "-clKernel", "1", MinerOptionFlagType.SingleParam, ","),
+                    new MinerOption("Phoenix_clNew", "-clNew", "-clNew", "1", MinerOptionFlagType.SingleParam, ","),
+                    new MinerOption("Phoenix_clf", "-clf", "-clf", "1", MinerOptionFlagType.SingleParam, ","),
+                    new MinerOption("Phoenix_nvNew", "-nvNew", "-nvNew", "1", MinerOptionFlagType.SingleParam, ","),
+                    new MinerOption("Phoenix_nvf", "-nvf", "-nvf", "1", MinerOptionFlagType.MultiParam, ","),
+                },
+                new List<MinerOption>
+                {
+                    // temperature stuff
+                    new MinerOption("Phoenix_fanmax", "-fanmax", "-fanmax", "-1", MinerOptionFlagType.MultiParam, ","),
+                    new MinerOption("Phoenix_fanmin", "-fanmin", "-fanmin", "-1", MinerOptionFlagType.MultiParam, ","),
+                    new MinerOption("Phoenix_tmax", "-tmax", "-tmax", "-1", MinerOptionFlagType.MultiParam, ","),
+                    new MinerOption("Phoenix_powlim", "-powlim", "-powlim", "0", MinerOptionFlagType.MultiParam, ","),
+                    new MinerOption("Phoenix_cclock", "-cclock", "-cclock", "0", MinerOptionFlagType.MultiParam, ","),
+                    new MinerOption("Phoenix_cvddc", "-cvddc", "-cvddc", "0", MinerOptionFlagType.MultiParam, ","),
+                    new MinerOption("Phoenix_mclock", "-mclock", "-mclock", "0", MinerOptionFlagType.MultiParam, ","),
+                    new MinerOption("Phoenix_mvddc", "-mvddc", "-mvddc", "0", MinerOptionFlagType.MultiParam, ","),                   }
             ),
             new MinerOptionPackage(
                 MinerType.EWBF,

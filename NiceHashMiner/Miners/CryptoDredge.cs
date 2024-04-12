@@ -64,16 +64,28 @@ namespace NiceHashMiner.Miners
                 " -o " + alg + ".br.nicehash.com:" + port + " " + " -u " + username + " -p x " +
                 " -o " + alg + ".usa.nicehash.com:" + port + " " + " -u " + username + " -p x " +
                 " -o " + alg + ".eu.nicehash.com:" + port + " -u " + username + " -p x " +
+                " -o " + url + " -u " + username + " -p x --log " + GetLogFileName() +
                 apiBind + 
                 " -d " + GetDevicesCommandString() + " " +
                 ExtraLaunchParametersParser.ParseForMiningSetup(MiningSetup, DeviceType.NVIDIA) + " ";
-
             ProcessHandle = _Start();
         }
 
         protected override void _Stop(MinerStopType willswitch)
         {
             Stop_cpu_ccminer_sgminer_nheqminer(willswitch);
+            Thread.Sleep(200);
+            try { ProcessHandle.SendCtrlC((uint)Process.GetCurrentProcess().Id); } catch { }
+            Thread.Sleep(200);
+            foreach (var process in Process.GetProcessesByName("CryptoDredge.exe"))
+            {
+                try {
+                    process.Kill();
+                    Thread.Sleep(200);
+                    process.Kill();
+                }
+                catch (Exception e) { Helpers.ConsolePrint(MinerDeviceName, e.ToString()); }
+            }
         }
 
         // new decoupled benchmarking routines
@@ -86,20 +98,21 @@ namespace NiceHashMiner.Miners
             string alg = url.Substring(url.IndexOf("://") + 3, url.IndexOf(".") - url.IndexOf("://") - 3);
             string port = url.Substring(url.IndexOf(".com:") + 5, url.Length - url.IndexOf(".com:") - 5);
             var username = GetUsername(Globals.DemoUser, ConfigManager.GeneralConfig.WorkerName.Trim());
+            var apiBind = " --api-bind 127.0.0.1:" + ApiPort;
+            var algo = "--algo " + MiningSetup.MinerName;
 
-            var commandLine = " --algo " + algorithm.MinerName +
-                             " -o" + url + " -u " + username + " -p x " +
-                " -o stratum+tcp://" + alg + ".hk.nicehash.com:" + port + " " + " -u " + username + " -p x " +
-                " -o stratum+tcp://" + alg + ".jp.nicehash.com:" + port + " " + " -u " + username + " -p x " +
-                " -o stratum+tcp://" + alg + ".in.nicehash.com:" + port + " " + " -u " + username + " -p x " +
-                " -o stratum+tcp://" + alg + ".br.nicehash.com:" + port + " " + " -u " + username + " -p x " +
-                " -o stratum+tcp://" + alg + ".usa.nicehash.com:" + port + " " + " -u " + username + " -p x " +
-                " -o stratum+tcp://" + alg + ".eu.nicehash.com:" + port + " -u " + username + " -p x " +
-                              ExtraLaunchParametersParser.ParseForMiningSetup(
-                                  MiningSetup,
-                                  DeviceType.NVIDIA) +
-                              " -d ";
-            commandLine += GetDevicesCommandString();
+            var commandLine = algo +
+                " -o " + url + " -u " + username + " -p x " +
+                " --url=stratum+tcp://" + alg + ".hk.nicehash.com:" + port + " " + " -u " + username + " -p x " +
+                " -o " + alg + ".jp.nicehash.com:" + port + " " + " -u " + username + " -p x " +
+                " -o " + alg + ".in.nicehash.com:" + port + " " + " -u " + username + " -p x " +
+                " -o " + alg + ".br.nicehash.com:" + port + " " + " -u " + username + " -p x " +
+                " -o " + alg + ".usa.nicehash.com:" + port + " " + " -u " + username + " -p x " +
+                " -o " + alg + ".eu.nicehash.com:" + port + " -u " + username + " -p x " +
+                " -o " + url + " -u " + username + " -p x --log " + GetLogFileName() +
+                apiBind +
+                " -d " + GetDevicesCommandString() + " " +
+                ExtraLaunchParametersParser.ParseForMiningSetup(MiningSetup, DeviceType.NVIDIA) + " ";
 
             TotalCount = 2;
 
@@ -120,19 +133,63 @@ namespace NiceHashMiner.Miners
                     var st = outdata.IndexOf("Avr ");
                     var e = outdata.IndexOf("/s)");
 
-                    var parse = outdata.Substring(st + 4, e - st - 6).Trim();
+                    var parse = outdata.Substring(st + 4, e - st - 6).Trim().Replace(",",".");
                     double tmp = Double.Parse(parse, CultureInfo.InvariantCulture);
                     // save speed
+                    Helpers.ConsolePrint("BENCHMARK!", BenchmarkAlgorithm.AlgorithmName);
+                    if (BenchmarkAlgorithm.AlgorithmName == "Lyra2REv2") //Avr 27,57Mh/s
+                    {
+                        Helpers.ConsolePrint("BENCHMARK", "Lyra2REv2 benchmark ends");
+                        if (outdata.ToUpper().Contains("KH/S"))
+                            tmp *= 1000;
+                        else if (outdata.ToUpper().Contains("MH/S"))
+                            tmp *= 10000;
+                        else if (outdata.ToUpper().Contains("GH/S"))
+                            tmp *= 10000000000;
+                    }
+                    else if (BenchmarkAlgorithm.AlgorithmName == "Lyra2z")
+                    {
+                        Helpers.ConsolePrint("BENCHMARK", "Lyra2z benchmark ends");
+                        if (outdata.ToUpper().Contains("KH/S"))
+                            tmp *= 1000;
+                        else if (outdata.ToUpper().Contains("MH/S"))
+                            tmp *= 10000;
+                        else if (outdata.ToUpper().Contains("GH/S"))
+                            tmp *= 10000000000;
+                    }
+                    else if (BenchmarkAlgorithm.AlgorithmName == "NeoScrypt") //Avr 774,9KH/s (Avr 1241KH/s
+                    {
+                        Helpers.ConsolePrint("BENCHMARK", "Neoscrypt benchmark ends: "+tmp.ToString());
+                        if (outdata.ToUpper().Contains("KH/S"))
+                            tmp *= 1000;
+                        else if (outdata.ToUpper().Contains("MH/S"))
+                            tmp *= 100000;
+                        else if (outdata.ToUpper().Contains("GH/S"))
+                            tmp *= 100000000;
+                    }
+                    /*
+                    else if (BenchmarkAlgorithm.AlgorithmName == "Blake2s") //(Avr 2393MH/s
+                    {
+                        if (outdata.Contains("KH/s"))
+                            tmp *= 1000;
+                        else if (outdata.Contains("MH/s"))
+                            tmp *= 1000000;
+                        else if (outdata.Contains("GH/s"))
+                            tmp *= 10000000000;
+                    }
+                    else if (BenchmarkAlgorithm.AlgorithmName == "Skunk") //Avr 17,44MH/s
+                    {
+                        if (outdata.Contains("KH/s"))
+                            tmp *= 1000;
+                        else if (outdata.Contains("MH/s"))
+                            tmp *= 10000;
+                        else if (outdata.Contains("GH/s"))
+                            tmp *= 10000000000;
+                    }
+                    */
 
-                    if (outdata.Contains("kH/s"))
-                        tmp *= 10;
-                    else if (outdata.Contains("Mh/s"))
-                        tmp *= 10000;
-                    else if (outdata.Contains("GH/s"))
-                        tmp *= 10000000;
 
-
-                    speed += tmp;
+                        speed += tmp;
                     count++;
                     TotalCount--;
                 }

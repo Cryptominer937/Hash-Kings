@@ -102,8 +102,6 @@ namespace NiceHashMiner.Miners
             {
                 LastCommandLine = LastCommandLine + " --algo=2";
             }
-
-
             ProcessHandle = _Start();
         }
 

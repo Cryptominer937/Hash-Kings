@@ -317,6 +317,10 @@ namespace NiceHashMiner.Miners.Parsing
                     return MinerType.lyclMiner;
                 case MinerBaseType.trex:
                     return MinerType.trex;
+                case MinerBaseType.mkxminer:
+                     return MinerType.mkxminer;
+                case MinerBaseType.Phoenix:
+                     return MinerType.Phoenix;
 
 
                 case MinerBaseType.Claymore:
@@ -377,6 +381,8 @@ namespace NiceHashMiner.Miners.Parsing
                     return MinerType.EWBF;
                 case MinerBaseType.Xmrig:
                     return MinerType.Xmrig;
+                case MinerBaseType.XmrigAMD:
+                    return MinerType.XmrigAMD;
                 case MinerBaseType.dstm:
                     return MinerType.dstm;
             }

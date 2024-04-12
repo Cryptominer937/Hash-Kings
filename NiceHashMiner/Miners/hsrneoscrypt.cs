@@ -73,8 +73,6 @@ namespace NiceHashMiner.Miners
                                   " --devices ";
             LastCommandLine += GetDevicesCommandString();
             ProcessHandle = _Start();
-
-
         }
 
         protected override void _Stop(MinerStopType willswitch)

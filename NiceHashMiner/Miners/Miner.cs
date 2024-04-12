@@ -51,7 +51,7 @@ namespace NiceHashMiner
 
     public abstract class Miner
     {
-         // MinerIDCount used to identify miners creation
+        // MinerIDCount used to identify miners creation
         protected static long MinerIDCount { get; private set; }
 
         public NhmConectionType ConectionType { get; protected set; }
@@ -139,6 +139,115 @@ namespace NiceHashMiner
 
         protected bool IsMultiType;
         public static string BenchmarkStringAdd = "";
+        public static string InBenchmark = "";
+        string BeforeOrAfterMiningString = "@echo off\r\n" +
+    "\r\n" +
+    "rem ****************************************************************************************\r\n" +
+    "rem * Set RUN on TRUE to enable this command scrypt\r\n" +
+    "rem * Установите параметр RUN в TRUE, что бы включить выполнение этого коммандного файла\r\n" +
+    "rem ****************************************************************************************\r\n" +
+    "SET RUN=FALSE\r\n" +
+    "\r\n" +
+    "rem ****************************************************************************************\r\n" +
+    "rem * Установите параметр NOVISIBLE в TRUE, что бы скрыть окно выполнения этого коммандного файла\r\n" +
+    "rem * Set NOVISIBLE on TRUE to hide command window\r\n" +
+    "rem ****************************************************************************************\r\n" +
+    "SET NOVISIBLE=FALSE\r\n" +
+    "\r\n" +
+    "rem ****************************************************************************************\r\n" +
+    "rem * Все команды в разделах приведены только для примера\r\n" +
+    "rem * All commands in sections are given for example only\r\n" +
+    "rem * Добавьте свои команды установки профилей разгона и т.п. в необходимые секции\r\n" +
+    "rem * Add your own commands to install overclocking profiles, etc. in necessary sections\r\n" +
+    "rem ****************************************************************************************\r\n" +
+    "cd..\r\n" +
+    "cd..\r\n" +
+    "if \"%1\" EQU \"AMD\" goto amd\r\n" +
+    "if \"%1\" EQU \"NVIDIA\" goto nvidia\r\n" +
+    "if \"%1\" EQU \"CPU\" goto end\r\n" +
+    "goto end\r\n" +
+    "\r\n" +
+
+    ":nvidia\r\n" +
+    "if \"%2\" EQU \"DUAL\" goto nvidiadual\r\n" +
+    "rem ****************************************************************************************\r\n" +
+    "rem * MSI Afterburner section for NVIDIA\r\n" +
+    "rem * MSI Afterburner раздел, для исполнения команд для NVIDIA\r\n" +
+    "rem ****************************************************************************************\r\n" +
+    "echo NVIDIA\r\n" +
+    "::start \"start \"\" \"C:\\Program Files(x86)\\MSI Afterburner\\MSIAfterburner.exe\" -Profile2\r\n" +
+    "\r\n" +
+    "rem NVIDIA Inspector section\r\n" +
+    "::utils\\nvidiaInspector.exe -setBaseClockOffset:0,0,100 -setMemoryClockOffset:0,0,500 -setPowerTarget:0,95 -setTempTarget:0,0,75 -setFanSpeed:0,-1\r\n" +
+    "::utils\\nvidiaInspector.exe -setBaseClockOffset:1,0,100 -setMemoryClockOffset:1,0,500 -setPowerTarget:1,95 -setTempTarget:1,0,75 -setFanSpeed:1,-1\r\n" +
+    "::utils\\nvidiaInspector.exe -setBaseClockOffset:2,0,100 -setMemoryClockOffset:2,0,500 -setPowerTarget:2,95 -setTempTarget:2,0,75 -setFanSpeed:2,-1\r\n" +
+    "::utils\\nvidiaInspector.exe -setBaseClockOffset:3,0,100 -setMemoryClockOffset:3,0,500 -setPowerTarget:3,95 -setTempTarget:3,0,75 -setFanSpeed:3,-1\r\n" +
+    "::utils\\nvidiaInspector.exe -setBaseClockOffset:4,0,100 -setMemoryClockOffset:4,0,500 -setPowerTarget:4,95 -setTempTarget:4,0,75 -setFanSpeed:4,-1\r\n" +
+    "rem ****************************************************************************************\r\n" +
+    "rem * End of MSI Afterburner section for NVIDIA\r\n" +
+    "rem * Конец MSI Afterburner раздела, для исполнения команд для NVIDIA\r\n" +
+    "rem ****************************************************************************************\r\n" +
+    "goto end\r\n" +
+    "\r\n" +
+
+    ":nvidiadual\r\n" +
+    "rem ****************************************************************************************\r\n" +
+    "rem MSI Afterburner section for NVIDIA (claymore dual mode)\r\n" +
+    "rem * MSI Afterburner раздел, для исполнения команд для NVIDIA (claymore dual mode)\r\n" +
+    "rem ****************************************************************************************\r\n" +
+    "echo NVIDIA DUAL\r\n" +
+    "::start \"start \"\" \"C:\\Program Files(x86)\\MSI Afterburner\\MSIAfterburner.exe\" -Profile2\r\n" +
+    "\r\n" +
+    "rem NVIDIA Inspector section\r\n" +
+    "::utils\\nvidiaInspector.exe -setBaseClockOffset:0,0,100 -setMemoryClockOffset:0,0,500 -setPowerTarget:0,95 -setTempTarget:0,0,75 -setFanSpeed:0,-1\r\n" +
+    "::utils\\nvidiaInspector.exe -setBaseClockOffset:1,0,100 -setMemoryClockOffset:1,0,500 -setPowerTarget:1,95 -setTempTarget:1,0,75 -setFanSpeed:1,-1\r\n" +
+    "::utils\\nvidiaInspector.exe -setBaseClockOffset:2,0,100 -setMemoryClockOffset:2,0,500 -setPowerTarget:2,95 -setTempTarget:2,0,75 -setFanSpeed:2,-1\r\n" +
+    "::utils\\nvidiaInspector.exe -setBaseClockOffset:3,0,100 -setMemoryClockOffset:3,0,500 -setPowerTarget:3,95 -setTempTarget:3,0,75 -setFanSpeed:3,-1\r\n" +
+    "::utils\\nvidiaInspector.exe -setBaseClockOffset:4,0,100 -setMemoryClockOffset:4,0,500 -setPowerTarget:4,95 -setTempTarget:4,0,75 -setFanSpeed:4,-1\r\n" +
+    "rem ****************************************************************************************\r\n" +
+    "rem End of MSI Afterburner section for NVIDIA (claymore dual mode)\r\n" +
+    "rem * Конец MSI Afterburner раздела, для исполнения команд для NVIDIA (claymore dual mode)\r\n" +
+    "rem ****************************************************************************************\r\n" +
+    "goto end\r\n" +
+    "\r\n" +
+
+    ":amd\r\n" +
+    "rem ****************************************************************************************\r\n" +
+    "rem * MSI Afterburner section for AMD\r\n" +
+    "rem * MSI Afterburner раздел, для исполнения команд для AMD\r\n" +
+    "rem ****************************************************************************************\r\n" +
+    "if \"%2\" EQU \"DUAL\" goto amddual\r\n" +
+    "echo AMD\r\n" +
+    "rem AMD OverdriveNTool section for AMD only ETH mode\r\n" +
+    "::utils\\OverdriveNTool.exe -p0\"card0\"\r\n" +
+    "::utils\\OverdriveNTool.exe -p1\"card1\"\r\n" +
+    "rem ****************************************************************************************\r\n" +
+    "rem * End of MSI Afterburner section for AMD\r\n" +
+    "rem * Конец MSI Afterburner раздела, для исполнения команд для AMD\r\n" +
+    "rem ****************************************************************************************\r\n" +
+    "goto end\r\n" +
+    "\r\n" +
+
+    ":amddual\r\n" +
+    "rem ****************************************************************************************\r\n" +
+    "rem MSI Afterburner section for AMD (claymore dual mode)\r\n" +
+    "rem * MSI Afterburner раздел, для исполнения команд для AMD (claymore dual mode)\r\n" +
+    "rem ****************************************************************************************\r\n" +
+    "echo AMD DUAL\r\n" +
+    "rem AMD OverdriveNTool section for AMD dual mode\r\n" +
+    "::utils\\OverdriveNTool.exe -p0\"card0\"\r\n" +
+    "::utils\\OverdriveNTool.exe -p1\"card1\"\r\n" +
+    "rem ****************************************************************************************\r\n" +
+    "rem End of MSI Afterburner section for AMD (claymore dual mode)\r\n" +
+    "rem * Конец MSI Afterburner раздела, для исполнения команд для AMD (claymore dual mode)\r\n" +
+    "rem ****************************************************************************************\r\n" +
+    "goto end\r\n" +
+    "\r\n" +
+
+    ":end\r\n" +
+    "echo END\r\n" +
+    "rem Do NOT disable this delay\r\n" +
+    "timeout /t 1 /nobreak\r\n";
 
         protected Miner(string minerDeviceName)
         {
@@ -324,6 +433,7 @@ namespace NiceHashMiner
             _Stop(willswitch);
             PreviousTotalMH = 0.0;
             IsRunning = false;
+            RunCMDBeforeOrAfterMining(false);
         }
 
         public void End()
@@ -504,13 +614,13 @@ namespace NiceHashMiner
             _benchmarkLogPath =
                 $"{Logger.LogPath}Log_{MiningSetup.MiningPairs[0].Device.Uuid}_{MiningSetup.MiningPairs[0].Algorithm.AlgorithmStringID}";
 
-            
+
             var commandLine = BenchmarkCreateCommandLine(BenchmarkAlgorithm, time);
 
             var benchmarkThread = new Thread(BenchmarkThreadRoutine);
 
             benchmarkThread.Start(commandLine);
-           
+
 
         }
 
@@ -617,7 +727,7 @@ namespace NiceHashMiner
 
         protected void CheckOutdata(string outdata)
         {
-//            Helpers.ConsolePrint("BENCHMARK_CheckOutData" , outdata);
+            //            Helpers.ConsolePrint("BENCHMARK_CheckOutData" , outdata);
             BenchLines.Add(outdata);
             // ccminer, cpuminer
             if (outdata.Contains("Cuda error"))
@@ -806,7 +916,7 @@ namespace NiceHashMiner
             try
             {
                 Helpers.ConsolePrint("BENCHMARK-routine", "Benchmark starts");
-                BenchmarkHandle = BenchmarkStartProcess((string) commandLine);
+                BenchmarkHandle = BenchmarkStartProcess((string)commandLine);
 
                 BenchmarkThreadRoutineStartSettup();
                 // wait a little longer then the benchmark routine if exit false throw
@@ -870,7 +980,7 @@ namespace NiceHashMiner
             {
                 Helpers.ConsolePrint("BENCHMARK-routineAlt", "Benchmark starts");
                 Helpers.ConsolePrint(MinerTag(), "Benchmark should end in : " + benchmarkTimeWait + " seconds");
-                BenchmarkHandle = BenchmarkStartProcess((string) commandLine);
+                BenchmarkHandle = BenchmarkStartProcess((string)commandLine);
                 BenchmarkHandle.WaitForExit(benchmarkTimeWait + 2);
                 var benchmarkTimer = new Stopwatch();
                 benchmarkTimer.Reset();
@@ -985,7 +1095,7 @@ namespace NiceHashMiner
             if (!IsMultiType) return idStr;
 
             // Miners that use multiple dev types need to also discriminate based on that
-            var types = MiningSetup.MiningPairs.Select(x => (int) x.Device.DeviceType);
+            var types = MiningSetup.MiningPairs.Select(x => (int)x.Device.DeviceType);
             return $"{string.Join(",", types)}-{idStr}";
         }
 
@@ -1021,6 +1131,7 @@ namespace NiceHashMiner
 
         protected virtual NiceHashProcess _Start()
         {
+            RunCMDBeforeOrAfterMining(true);
             // never start when ended
             if (_isEnded)
             {
@@ -1312,10 +1423,10 @@ namespace NiceHashMiner
 
             try
             {
-                var resps = resp.Split(new char[] {';'}, StringSplitOptions.RemoveEmptyEntries);
+                var resps = resp.Split(new char[] { ';' }, StringSplitOptions.RemoveEmptyEntries);
                 foreach (var res in resps)
                 {
-                    var optval = res.Split(new char[] {'='}, StringSplitOptions.RemoveEmptyEntries);
+                    var optval = res.Split(new char[] { '=' }, StringSplitOptions.RemoveEmptyEntries);
                     if (optval.Length != 2) continue;
                     if (optval[0] == "ALGO")
                         aname = optval[1];
@@ -1378,7 +1489,7 @@ namespace NiceHashMiner
                 return;
             }
 
-            _currentCooldownTimeInSecondsLeft -= (int) _cooldownCheckTimer.Interval;
+            _currentCooldownTimeInSecondsLeft -= (int)_cooldownCheckTimer.Interval;
             // if times up
             if (_currentCooldownTimeInSecondsLeft > 0) return;
             if (_needsRestart)
@@ -1409,5 +1520,243 @@ namespace NiceHashMiner
         }
 
         #endregion //Cooldown/retry logic
+
+        protected Process RunCMDBeforeOrAfterMining(bool isBefore)
+        {
+            bool CreateNoWindow = false;
+            var CMDconfigHandle = new Process
+            {
+                StartInfo =
+                {
+                    FileName = MiningSetup.MinerPath
+                }
+            };
+
+            var strPlatform = "";
+            var strDual = "";
+
+            foreach (var pair in MiningSetup.MiningPairs)
+            {
+                if (pair.Algorithm.DualNiceHashID == AlgorithmType.DaggerBlake2s ||
+                    pair.Algorithm.DualNiceHashID == AlgorithmType.DaggerDecred ||
+                    pair.Algorithm.DualNiceHashID == AlgorithmType.DaggerKeccak ||
+                    pair.Algorithm.DualNiceHashID == AlgorithmType.DaggerLbry ||
+                    pair.Algorithm.DualNiceHashID == AlgorithmType.DaggerPascal ||
+                    pair.Algorithm.DualNiceHashID == AlgorithmType.DaggerSia)
+                {
+                    strDual = "DUAL";
+                }
+                if (pair.Device.DeviceType == DeviceType.NVIDIA)
+                {
+                    strPlatform = "NVIDIA";
+                }
+                else if (pair.Device.DeviceType == DeviceType.AMD)
+                {
+                    strPlatform = "AMD";
+                }
+                else if (pair.Device.DeviceType == DeviceType.CPU)
+                {
+                    strPlatform = "CPU";
+                }
+            }
+
+            // string BeforeMiningString = "pause\n\r"; //pause работает, а нормальная строка нет!!
+
+            string MinerDir = MiningSetup.MinerPath.Substring(0, MiningSetup.MinerPath.LastIndexOf("\\"));
+            if (isBefore)
+            {
+                CMDconfigHandle.StartInfo.FileName = MinerDir + "\\BeforeMining.cmd";
+            } else
+            {
+                CMDconfigHandle.StartInfo.FileName = MinerDir + "\\AfterMining.cmd";
+            }
+//            Helpers.ConsolePrint("BeforeMiningString:", BeforeMiningString);
+            if (!File.Exists(CMDconfigHandle.StartInfo.FileName))
+            {
+                try
+                {
+                    FileStream fs = new FileStream(CMDconfigHandle.StartInfo.FileName, FileMode.Create, FileAccess.Write);
+                    StreamWriter w = new StreamWriter(fs);
+                    w.Write(BeforeOrAfterMiningString);
+                    w.Flush();
+                    w.Close();
+                    return null;
+                }
+                catch (Exception e)
+                {
+                    Helpers.ConsolePrint("RunCMDBeforeOrAfterMining", e.ToString());
+                }
+
+            } else
+            {
+                var cmd = "";
+                FileStream fs = new FileStream(CMDconfigHandle.StartInfo.FileName, FileMode.Open, FileAccess.Read);
+                StreamReader w = new StreamReader(fs);
+                cmd = w.ReadToEnd();
+                w.Close();
+
+                if (cmd.ToUpper().Trim().Contains("SET NOVISIBLE=TRUE"))
+                {
+                    CreateNoWindow = true;
+                }
+                if (cmd.ToUpper().Trim().Contains("SET RUN=FALSE"))
+                {
+                    return null;
+                }
+            }
+                //BenchmarkProcessPath = CMDconfigHandle.StartInfo.WorkingDirectory;
+                Helpers.ConsolePrint(MinerTag(), "Using CMD: " + CMDconfigHandle.StartInfo.FileName);
+                //CMDconfigHandle.StartInfo.WorkingDirectory = WorkingDirectory;
+
+            if (MinersSettingsManager.MinerSystemVariables.ContainsKey(Path))
+            {
+                foreach (var kvp in MinersSettingsManager.MinerSystemVariables[Path])
+                {
+                    var envName = kvp.Key;
+                    var envValue = kvp.Value;
+                    CMDconfigHandle.StartInfo.EnvironmentVariables[envName] = envValue;
+                }
+            }
+
+            Thread.Sleep(200);
+
+            CMDconfigHandle.StartInfo.Arguments = strPlatform + " " + strDual;
+            CMDconfigHandle.StartInfo.UseShellExecute = false;
+            // CMDconfigHandle.StartInfo.RedirectStandardError = true;
+            // CMDconfigHandle.StartInfo.RedirectStandardOutput = true;
+            CMDconfigHandle.StartInfo.CreateNoWindow = CreateNoWindow;
+            Thread.Sleep(250);
+            Helpers.ConsolePrint(MinerTag(), "Start CMD: " + CMDconfigHandle.StartInfo.FileName + CMDconfigHandle.StartInfo.Arguments);
+            CMDconfigHandle.Start();
+
+            try
+            {
+                if (!CMDconfigHandle.WaitForExit(60 * 1000))
+                {
+                    CMDconfigHandle.Kill();
+                    CMDconfigHandle.WaitForExit(5 * 1000);
+                    CMDconfigHandle.Close();
+                }
+            }
+            catch (Exception e)
+            {
+                Helpers.ConsolePrint("KillCMDBeforeOrAfterMining", e.ToString());
+            }
+
+            Thread.Sleep(50);
+            return CMDconfigHandle;
+        }
+
+        protected virtual void RunCMDAfterMining(string CMDparam, NiceHashProcess ProcessHandle)
+        {
+            while (ProcessHandle != null)
+            {
+            }
+            bool CreateNoWindow = false;
+            var CMDconfigHandle = new Process
+            {
+                StartInfo =
+                {
+                    FileName = MiningSetup.MinerPath
+                }
+            };
+
+            // string BeforeMiningString = "pause\n\r"; //pause работает, а нормальная строка нет!!
+
+            string MinerDir = MiningSetup.MinerPath.Substring(0, MiningSetup.MinerPath.LastIndexOf("\\"));
+            CMDconfigHandle.StartInfo.FileName = MinerDir + "\\AfterMining.cmd";
+
+            //            Helpers.ConsolePrint("BeforeMiningString:", BeforeMiningString);
+            if (!File.Exists(CMDconfigHandle.StartInfo.FileName))
+            {
+                try
+                {
+                    FileStream fs = new FileStream(CMDconfigHandle.StartInfo.FileName, FileMode.Create, FileAccess.Write);
+                    StreamWriter w = new StreamWriter(fs);
+                    w.Write(BeforeOrAfterMiningString);
+                    w.Flush();
+                    w.Close();
+                    return;
+                }
+                catch (Exception e)
+                {
+                    Helpers.ConsolePrint("RunCMDBeforeOrAfterMining", e.ToString());
+                }
+
+            }
+            else
+            {
+                var cmd = "";
+                FileStream fs = new FileStream(CMDconfigHandle.StartInfo.FileName, FileMode.Open, FileAccess.Read);
+                StreamReader w = new StreamReader(fs);
+                cmd = w.ReadToEnd();
+                w.Close();
+
+                if (cmd.ToUpper().Trim().Contains("SET NOVISIBLE=TRUE"))
+                {
+                    CreateNoWindow = true;
+                }
+                if (cmd.ToUpper().Trim().Contains("SET RUN=FALSE"))
+                {
+                    return;
+                }
+            }
+            //BenchmarkProcessPath = CMDconfigHandle.StartInfo.WorkingDirectory;
+            Helpers.ConsolePrint(MinerTag(), "Using CMD: " + CMDconfigHandle.StartInfo.FileName);
+            //CMDconfigHandle.StartInfo.WorkingDirectory = WorkingDirectory;
+
+            if (MinersSettingsManager.MinerSystemVariables.ContainsKey(Path))
+            {
+                foreach (var kvp in MinersSettingsManager.MinerSystemVariables[Path])
+                {
+                    var envName = kvp.Key;
+                    var envValue = kvp.Value;
+                    CMDconfigHandle.StartInfo.EnvironmentVariables[envName] = envValue;
+                }
+            }
+
+            Thread.Sleep(200);
+
+            CMDconfigHandle.StartInfo.Arguments = CMDparam;
+            CMDconfigHandle.StartInfo.UseShellExecute = false;
+            // CMDconfigHandle.StartInfo.RedirectStandardError = true;
+            // CMDconfigHandle.StartInfo.RedirectStandardOutput = true;
+            CMDconfigHandle.StartInfo.CreateNoWindow = CreateNoWindow;
+            Thread.Sleep(250);
+            Helpers.ConsolePrint(MinerTag(), "Start CMD: " + CMDconfigHandle.StartInfo.FileName + CMDconfigHandle.StartInfo.Arguments);
+            CMDconfigHandle.Start();
+
+            try
+            {
+                if (!CMDconfigHandle.WaitForExit(60 * 1000))
+                {
+                    CMDconfigHandle.Kill();
+                    CMDconfigHandle.WaitForExit(5 * 1000);
+                    CMDconfigHandle.Close();
+                }
+            }
+            catch (Exception e)
+            {
+                Helpers.ConsolePrint("KillCMDBeforeOrAfterMining", e.ToString());
+            }
+
+            Thread.Sleep(50);
+            return;
+        }
+        /*
+        protected void KillCMDBeforeMining(Process CMDconfigHandle)
+        {
+            try
+            {
+                    CMDconfigHandle.Kill();
+                    CMDconfigHandle.WaitForExit(1 * 1000);
+                    CMDconfigHandle.Close();
+            }
+            catch (Exception e)
+            {
+                Helpers.ConsolePrint("KillCMDBeforeMining", e.ToString());
+            }
+        }
+        */
     }
 }

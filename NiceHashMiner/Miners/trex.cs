@@ -35,7 +35,7 @@ namespace NiceHashMiner.Miners
             }
             var username = GetUsername(btcAdress, worker);
 
-            IsApiReadException = MiningSetup.MinerPath == MinerPaths.Data.CryptoDredge;
+            //IsApiReadException = MiningSetup.MinerPath == MinerPaths.Data.trex;
 
             var algo = "";
             var apiBind = "";
@@ -62,7 +62,6 @@ namespace NiceHashMiner.Miners
             " -o " + url + " -u " + username + " -p x " +
             " -d " + GetDevicesCommandString() + " " +
             ExtraLaunchParametersParser.ParseForMiningSetup(MiningSetup, DeviceType.NVIDIA) + " ";
-
             ProcessHandle = _Start();
         }
 

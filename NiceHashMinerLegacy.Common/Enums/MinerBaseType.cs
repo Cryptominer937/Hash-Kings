@@ -21,6 +21,7 @@
         EWBF,
         Prospector,
         Xmrig,
+        XmrigAMD,
         XmrStakAMD,
         Claymore_old,
         dstm,
@@ -30,6 +31,8 @@
         ZEnemy,
         lyclMiner,
         trex,
+        mkxminer,
+        Phoenix,
         END
     }
 }

@@ -95,7 +95,6 @@ namespace NiceHashMiner.Miners
                               " --device ";
 
             LastCommandLine += GetDevicesCommandString() + donate;
-
             ProcessHandle = _Start();
         }
 

@@ -248,7 +248,17 @@ namespace NiceHashMiner.Miners
 
             return totalRate;
         }
+        public double GetTotalPowerRate()
+        {
+            double totalPowerRate = 0;
 
+            if (_runningGroupMiners != null)
+            {
+                totalPowerRate += _runningGroupMiners.Values.Sum(groupMiner => groupMiner.PowerRate);
+            }
+
+            return totalPowerRate;
+        }
         // full of state
         private bool CheckIfProfitable(double currentProfit, bool log = true)
         {
@@ -614,6 +624,7 @@ namespace NiceHashMiner.Miners
                         // Deduct power costs
                         var powerUsage = ad.PowerUsage > 0 ? ad.PowerUsage : groupMiners.TotalPower;
                         groupMiners.CurrentRate -= ExchangeRateApi.GetKwhPriceInBtc() * powerUsage * 24 / 1000;
+                        groupMiners.PowerRate = ExchangeRateApi.GetKwhPriceInBtc() * powerUsage * 24 / 1000;
                     }
                     else
                     {
@@ -625,7 +636,7 @@ namespace NiceHashMiner.Miners
                     currentProfit += groupMiners.CurrentRate;
                     // Update GUI
                     _mainFormRatesComunication.AddRateInfo(m.MinerTag(), groupMiners.DevicesInfoString, ad,
-                        groupMiners.CurrentRate,
+                        groupMiners.CurrentRate, groupMiners.PowerRate,
                         m.IsApiReadException);
                 }
             }
