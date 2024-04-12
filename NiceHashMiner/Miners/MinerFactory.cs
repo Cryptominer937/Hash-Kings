@@ -41,6 +41,8 @@ namespace NiceHashMiner.Miners {
                     return new ccminer();
                 case MinerBaseType.sgminer:
                     return new sgminer();
+                case MinerBaseType.GatelessGate:
+                    return new glg();
                 case MinerBaseType.nheqminer:
                     return new nheqminer();
                 case MinerBaseType.ethminer:
@@ -59,6 +61,8 @@ namespace NiceHashMiner.Miners {
                     return CreateExperimental(deviceType, algorithmType);
                 case MinerBaseType.EWBF:
                     return new EWBF();
+                case MinerBaseType.DSTM:
+                    return new DSTM();
                 case MinerBaseType.Prospector:
                     return new Prospector();
                 case MinerBaseType.Xmrig:

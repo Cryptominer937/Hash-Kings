@@ -10,6 +10,7 @@ namespace NiceHashMiner.Enums {
         ethminer_OCL,
         ethminer_CUDA,
         sgminer,
+        glg,
         cpuminer_opt,
         nheqminer_CPU,
         nheqminer_CUDA,
@@ -22,6 +23,7 @@ namespace NiceHashMiner.Enums {
         excavator,
         ClaymoreDual,
         EWBF,
+        DSTM,
         Xmrig,
         END
     }

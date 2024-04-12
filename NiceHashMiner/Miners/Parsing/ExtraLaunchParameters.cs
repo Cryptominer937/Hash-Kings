@@ -74,6 +74,34 @@ namespace NiceHashMiner.Miners.Parsing {
                 }
             ),
             new MinerOptionPackage(
+                MinerType.glg,
+                new List<MinerOption>() {
+                    // SingleParam
+                    new MinerOption("KeccakUnroll", "", "--keccak-unroll", "0", MinerOptionFlagType.SingleParam, ""),
+                    new MinerOption("HamsiExpandBig", "", "--hamsi-expand-big", "4", MinerOptionFlagType.SingleParam, ""),
+                    new MinerOption("Nfactor", "", "--nfactor", "10", MinerOptionFlagType.SingleParam, ""),
+                    // MultiParam TODO IMPORTANT check defaults
+                    new MinerOption("Intensity", "-I", "--intensity", "d", MinerOptionFlagType.MultiParam, ","), // default is "d" check if -1 works
+                    new MinerOption("Xintensity", "-X", "--xintensity", "-1", MinerOptionFlagType.MultiParam, ","), // default none
+                    new MinerOption("Rawintensity", "", "--rawintensity", "-1", MinerOptionFlagType.MultiParam, ","), // default none
+                    new MinerOption("ThreadConcurrency", "", "--thread-concurrency", "-1", MinerOptionFlagType.MultiParam, ","), // default none
+                    new MinerOption("Worksize", "-w", "--worksize", "-1", MinerOptionFlagType.MultiParam, ","), // default none
+                    new MinerOption("GpuThreads", "-g", "--gpu-threads", "1", MinerOptionFlagType.MultiParam, ","),
+                    new MinerOption("LookupGap", "", "--lookup-gap", "-1", MinerOptionFlagType.MultiParam, ","), // default none
+                    // Uni
+                    new MinerOption("RemoveDisabled", "--remove-disabled", "--remove-disabled", "", MinerOptionFlagType.Uni, ""), // default none
+                },
+                // TemperatureOptions
+                new List<MinerOption>() {
+                    new MinerOption("GpuFan", "", "--gpu-fan", "30-60", MinerOptionFlagType.MultiParam, ","), // default none
+                    new MinerOption("TempCutoff", "", "--temp-cutoff", "95", MinerOptionFlagType.MultiParam, ","),
+                    new MinerOption("TempOverheat", "", "--temp-overheat", "85", MinerOptionFlagType.MultiParam, ","),
+                    new MinerOption("TempTarget", "", "--temp-target", "75", MinerOptionFlagType.MultiParam, ","),
+                    new MinerOption("AutoFan", "", "--auto-fan", null, MinerOptionFlagType.Uni, ""),
+                    new MinerOption("AutoGpu", "", "--auto-gpu", null, MinerOptionFlagType.Uni, "")
+                }
+            ),
+            new MinerOptionPackage(
                 MinerType.cpuminer_opt,
                 new List<MinerOption>() {
                     new MinerOption("Threads", "-t", "--threads=", "-1", MinerOptionFlagType.MultiParam, ","), // default none
@@ -248,22 +276,32 @@ namespace NiceHashMiner.Miners.Parsing {
                     new MinerOption("EWBF_intensity", "--intensity", "--intensity", "64", MinerOptionFlagType.MultiParam, " "),
                     new MinerOption("EWBF_powercalc", "--pec", "--pec", null, MinerOptionFlagType.Uni, " "),
                 },
-                new List<MinerOption>()
+                new List<MinerOption>(){ }
+            ),
+            new MinerOptionPackage(
+                MinerType.DSTM,
+                new List<MinerOption>() {
+                    // parameters differ according to algorithm
+                    new MinerOption("DSTM_temperature", "--temp-target", "--temp-target", "90", MinerOptionFlagType.SingleParam, " "),
+                    new MinerOption("DSTM_reconnect", "--noreconnect", "--noreconnect", null, MinerOptionFlagType.SingleParam, " "),
+                },
+                new List<MinerOption>(){}
             ),
             new MinerOptionPackage(
                 MinerType.Xmrig,
-                new List<MinerOption> {
-                    new MinerOption("Xmrig_fee", "--donate-level=", "0", MinerOptionFlagType.SingleParam),
-                    new MinerOption("Xmrig_threads", "-t", "--threads=", null, MinerOptionFlagType.SingleParam),
-                    new MinerOption("Xmrig_av", "-v", "--av=", "0", MinerOptionFlagType.SingleParam),
-                    new MinerOption("Xmrig_affinity", "--cpu-affinity", null, MinerOptionFlagType.SingleParam),
-                    new MinerOption("Xmrig_priority", "--cpu-priority", null, MinerOptionFlagType.SingleParam),
-                    new MinerOption("Xmrig_nohugepages", "--no-huge-pages", null, MinerOptionFlagType.Uni),
-                    new MinerOption("Xmrig_nocolor", "--no-color", null, MinerOptionFlagType.Uni),
-                    new MinerOption("Xmrig_maxusage", "--max-cpu-usage=", "75", MinerOptionFlagType.SingleParam),
-                    new MinerOption("Xmrig_safe", "--safe", null, MinerOptionFlagType.Uni)
+                new List<MinerOption>() {
+                    new MinerOption("Xmrig_fee", "--donate-level=", "0", MinerOptionFlagType.SingleParam, " "),
+                    new MinerOption("Xmrig_threads", "-t", "--threads=", null, MinerOptionFlagType.SingleParam, " "),
+                    new MinerOption("Xmrig_av", "-v", "--av=", "0", MinerOptionFlagType.SingleParam, " "),
+                    new MinerOption("Xmrig_affinity", "--cpu-affinity", null, MinerOptionFlagType.SingleParam, " "),
+                    new MinerOption("Xmrig_priority", "--cpu-priority", null, MinerOptionFlagType.SingleParam, " "),
+                    new MinerOption("Xmrig_nohugepages", "--no-huge-pages", null, MinerOptionFlagType.Uni, " "),
+                    new MinerOption("Xmrig_nocolor", "--no-color", null, MinerOptionFlagType.Uni, " "),
+                    new MinerOption("Xmrig_maxusage", "--max-cpu-usage=", "75", MinerOptionFlagType.SingleParam, " "),
+                    new MinerOption("Xmrig_safe", "--safe", null, MinerOptionFlagType.Uni, " ")
                 },
-                new List<MinerOption>())
+                new List<MinerOption>(){ }
+             )
         };
 
         private static List<MinerOptionPackage> MinerOptionPackages = new List<MinerOptionPackage>();

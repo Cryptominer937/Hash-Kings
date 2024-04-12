@@ -18,21 +18,21 @@ using System.Threading.Tasks;
 
 namespace NiceHashMiner.Miners
 {
-    class sgminer : Miner
+    class glg : Miner
     {
         private readonly int GPUPlatformNumber;
         Stopwatch _benchmarkTimer = new Stopwatch();
 
-        public sgminer()
-            : base("sgminer_AMD")
+        public glg()
+            : base("glg_AMD")
         {
             GPUPlatformNumber = ComputeDeviceManager.Avaliable.AMDOpenCLPlatformNum;
             IsKillAllUsedMinerProcs = true;
         }
 
         // use ONLY for exiting a benchmark
-        public void KillSGMiner() {
-            foreach (Process process in Process.GetProcessesByName("sgminer")) {
+        public void Killglg() {
+            foreach (Process process in Process.GetProcessesByName("gatelessgate")) {
                 try { process.Kill(); } catch (Exception e) { Helpers.ConsolePrint(MinerDeviceName, e.ToString()); }
             }
         }
@@ -42,7 +42,7 @@ namespace NiceHashMiner.Miners
                 BenchmarkProcessStatus = BenchmarkProcessStatus.Killing;
                 try {
                     Helpers.ConsolePrint("BENCHMARK", String.Format("Trying to kill benchmark process {0} algorithm {1}", BenchmarkProcessPath, BenchmarkAlgorithm.AlgorithmName));
-                    KillSGMiner();
+                    Killglg();
                 } catch { } finally {
                     BenchmarkProcessStatus = BenchmarkProcessStatus.DoneKilling;
                     Helpers.ConsolePrint("BENCHMARK", String.Format("Benchmark process {0} algorithm {1} KILLED", BenchmarkProcessPath, BenchmarkAlgorithm.AlgorithmName));
@@ -66,7 +66,6 @@ namespace NiceHashMiner.Miners
                 return;
             }
             string username = GetUsername(btcAdress, worker);
-
             //add failover
             string alg = url.Substring(url.IndexOf("://") + 3, url.IndexOf(".") - url.IndexOf("://") - 3);
             string port = url.Substring(url.IndexOf(".com:") + 5, url.Length - url.IndexOf(".com:") - 5);
@@ -101,7 +100,7 @@ namespace NiceHashMiner.Miners
                                                                 MiningSetup,
                                                                 DeviceType.AMD) +
                               " --device ";
-            
+
             LastCommandLine += GetDevicesCommandString();
 
             ProcessHandle = _Start();
@@ -122,14 +121,16 @@ namespace NiceHashMiner.Miners
                 username += "." + ConfigManager.GeneralConfig.WorkerName.Trim();
 
             // cd to the cgminer for the process bins
-            CommandLine = " /C \"cd /d " + WorkingDirectory + " && sgminer.exe " +
+            CommandLine = " /C \"cd /d " + WorkingDirectory + " && gatelessgate.exe " +
                           " --gpu-platform " + GPUPlatformNumber +
                           " -k " + algorithm.MinerName +
-                          " --url=" + url +
-                          " --userpass=" + Globals.DemoUser +
+                          " --url=" + url + "/#xnsub" +
+                          " --userpass=" + Globals.DemoUser + 
                           " -p x " +
                           " --sched-stop " + DateTime.Now.AddSeconds(time).ToString("HH:mm") +
                           " -T --log 10 --log-file dump.txt" +
+                          " --api-listen" +
+                          " --api-port=" + APIPort.ToString() +
                           " " +
                           ExtraLaunchParametersParser.ParseForMiningSetup(
                                                                 MiningSetup,
@@ -143,72 +144,40 @@ namespace NiceHashMiner.Miners
             return CommandLine;
         }
 
-        protected override bool BenchmarkParseLine(string outdata)
-        {
- //           Helpers.ConsolePrint("BENCHMARK", outdata);
-            string hashSpeed1 = "";
+        protected override bool BenchmarkParseLine(string outdata) {
+          //  Helpers.ConsolePrint("BENCHMARK", out);
+            string hashSpeed = "";
             int kspeed = 1;
-            if (outdata.Contains("Terminating execution as planned") && BenchmarkAlgorithm.NiceHashID != AlgorithmType.DaggerHashimoto)
+            if (outdata.Contains("Terminating execution as planned") )
             {
                 return true;
             }
-            if (outdata.Contains("(avg)") && outdata.Contains("h/s") && BenchmarkAlgorithm.NiceHashID != AlgorithmType.DaggerHashimoto)
-            {
+            if (outdata.Contains("(avg)") && outdata.Contains("h/s") && BenchmarkAlgorithm.NiceHashID != AlgorithmType.DaggerHashimoto) {
                 int i = outdata.IndexOf("(avg):");
                 int k = outdata.IndexOf("h/s");
 
                 if (outdata.Contains("h/s"))
                 {
-                    hashSpeed1 = outdata.Substring(i + 6, k - i - 6);
+                    hashSpeed = outdata.Substring(i + 6, k - i - 6);
                     kspeed = 1;
                 }
                 if (outdata.Contains("Kh/s"))
                 {
-                    hashSpeed1 = outdata.Substring(i + 6, k - i - 7);
+                    hashSpeed = outdata.Substring(i + 6, k - i - 7);
                     kspeed = 1000;
                 }
                 if (outdata.Contains("Mh/s"))
                 {
-                    hashSpeed1 = outdata.Substring(i + 6, k - i - 7);
+                    hashSpeed = outdata.Substring(i + 6, k - i - 7);
                     kspeed = 1000000;
                 }
 
-                double speed = Double.Parse(hashSpeed1, CultureInfo.InvariantCulture);
-                Helpers.ConsolePrint("BENCHMARK", "Final Speed: " + hashSpeed1);
-                BenchmarkAlgorithm.BenchmarkSpeed = speed * kspeed;
-                return false;
-
-            }
-            
-            else if (outdata.Contains(String.Format("GPU{0}", MiningSetup.MiningPairs[0].Device.ID)) && outdata.Contains("s):") && BenchmarkAlgorithm.NiceHashID == AlgorithmType.DaggerHashimoto) {
-                int i = outdata.IndexOf("s):");
-                int k = outdata.IndexOf("(avg)");
-
-                // save speed
-                string hashSpeed = outdata.Substring(i + 3, k - i + 3).Trim();
-                hashSpeed = hashSpeed.Replace("(avg):", "");
+                double speed = Double.Parse(hashSpeed, CultureInfo.InvariantCulture);
                 Helpers.ConsolePrint("BENCHMARK", "Final Speed: " + hashSpeed);
-
-                double mult = 1;
-                if (hashSpeed.Contains("K")) {
-                    hashSpeed = hashSpeed.Replace("K", " ");
-                    mult = 1000;
-                } else if (hashSpeed.Contains("M")) {
-                    hashSpeed = hashSpeed.Replace("M", " ");
-                    mult = 1000000;
-                }
-
-                hashSpeed = hashSpeed.Substring(0, hashSpeed.IndexOf(" "));
-                double speed = Double.Parse(hashSpeed, CultureInfo.InvariantCulture) * mult;
-
-                BenchmarkAlgorithm.BenchmarkSpeed = speed;
-
-                return true;
+                BenchmarkAlgorithm.BenchmarkSpeed = speed*kspeed;
+                return false;
             }
-            
             return false;
-            
-        
         }
 
         protected override void BenchmarkThreadRoutineStartSettup() {
@@ -216,14 +185,14 @@ namespace NiceHashMiner.Miners
             AlgorithmType NHDataIndex = BenchmarkAlgorithm.NiceHashID;
 
             if (Globals.NiceHashData == null) {
-                Helpers.ConsolePrint("BENCHMARK", "Skipping sgminer benchmark because there is no internet " +
-                    "connection. Sgminer needs internet connection to do benchmarking.");
+                Helpers.ConsolePrint("BENCHMARK", "Skipping gatelessgate benchmark because there is no internet " +
+                    "connection. Gatelessgate needs internet connection to do benchmarking.");
 
                 throw new Exception("No internet connection");
             }
 
             if (Globals.NiceHashData[NHDataIndex].paying == 0) {
-                Helpers.ConsolePrint("BENCHMARK", "Skipping sgminer benchmark because there is no work on Nicehash.com " +
+                Helpers.ConsolePrint("BENCHMARK", "Skipping gatelessgate benchmark because there is no work on Nicehash.com " +
                     "[algo: " + BenchmarkAlgorithm.AlgorithmName + "(" + NHDataIndex + ")]");
 
                 throw new Exception("No work can be used for benchmarking");
@@ -238,12 +207,12 @@ namespace NiceHashMiner.Miners
         protected override void BenchmarkOutputErrorDataReceivedImpl(string outdata) {
             if (_benchmarkTimer.Elapsed.TotalSeconds >= BenchmarkTimeInSeconds) {
                 string resp = GetAPIDataAsync(APIPort, "quit").Result.TrimEnd(new char[] { (char)0 });
-                Helpers.ConsolePrint("BENCHMARK", "SGMiner Response: " + resp);
+                Helpers.ConsolePrint("BENCHMARK", "gatelessgate Response: " + resp);
             }
             if (_benchmarkTimer.Elapsed.TotalSeconds >= BenchmarkTimeInSeconds + 2) {
                 _benchmarkTimer.Stop();
                 // this is safe in a benchmark
-                KillSGMiner();
+                Killglg();
                 BenchmarkSignalHanged = true;
             }
             if (!BenchmarkSignalFinnished && outdata != null) {
@@ -253,8 +222,8 @@ namespace NiceHashMiner.Miners
 
         protected override string GetFinalBenchmarkString() {
             if (BenchmarkAlgorithm.BenchmarkSpeed <= 0) {
-                Helpers.ConsolePrint("sgminer_GetFinalBenchmarkString", International.GetText("sgminer_precise_try"));
-                return International.GetText("sgminer_precise_try");
+                Helpers.ConsolePrint("gatelessgate_GetFinalBenchmarkString", International.GetText("gatelessgate_precise_try"));
+                return International.GetText("gatelessgate_precise_try");
             }
             return base.GetFinalBenchmarkString();
         }
@@ -287,7 +256,7 @@ namespace NiceHashMiner.Miners
                         || BenchmarkException != null) {
                         //EndBenchmarkProcces();
                         // this is safe in a benchmark
-                        KillSGMiner();
+                        Killglg();
                         if (BenchmarkSignalTimedout) {
                             throw new Exception("Benchmark timedout");
                         }
@@ -298,7 +267,7 @@ namespace NiceHashMiner.Miners
                             throw new Exception("Termined by user request");
                         }
                         if (BenchmarkSignalHanged) {
-                            throw new Exception("SGMiner is not responding");
+                            throw new Exception("gatelessgate is not responding");
                         }
                         if (BenchmarkSignalFinnished) {
                             break;
@@ -363,7 +332,7 @@ namespace NiceHashMiner.Miners
                     ad.Speed = Double.Parse(speed[1]) * 1000;
 
                     if (total_mh <= PreviousTotalMH) {
-                        Helpers.ConsolePrint(MinerTAG(), ProcessTag() + " SGMiner might be stuck as no new hashes are being produced");
+                        Helpers.ConsolePrint(MinerTAG(), ProcessTag() + " gatelessgate might be stuck as no new hashes are being produced");
                         Helpers.ConsolePrint(MinerTAG(), ProcessTag() + " Prev Total MH: " + PreviousTotalMH + " .. Current Total MH: " + total_mh);
                         _currentMinerReadStatus = MinerAPIReadStatus.NONE;
                         return null;

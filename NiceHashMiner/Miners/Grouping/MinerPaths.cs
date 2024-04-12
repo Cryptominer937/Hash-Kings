@@ -85,7 +85,7 @@ namespace NiceHashMiner.Miners.Grouping
             /// </summary>
             public const string sgminer_5_6_0_general = _bin + @"\sgminer-5-6-0-general\sgminer.exe";
             public const string sgminer_gm = _bin + @"\sgminer-gm\sgminer.exe";
-
+            public const string glg = _bin + @"\glg\gatelessgate.exe";
             public const string nheqminer = _bin + @"\nheqminer_v0.4b\nheqminer.exe";
             public const string excavator = _bin + @"\excavator\excavator.exe";
 
@@ -103,6 +103,7 @@ namespace NiceHashMiner.Miners.Grouping
             public const string OptiminerZcashMiner = _bin_3rdparty + @"\optiminer_zcash_win\Optiminer.exe";
             public const string ClaymoreDual = _bin_3rdparty + @"\claymore_dual\EthDcrMiner64.exe";
             public const string EWBF = _bin_3rdparty + @"\ewbf\miner.exe";
+            public const string DSTM = _bin_3rdparty + @"\dstm\zm.exe";
             public const string prospector = _bin_3rdparty + @"\prospector\prospector.exe";
         }
 
@@ -132,6 +133,8 @@ namespace NiceHashMiner.Miners.Grouping
                     return NVIDIA_GROUPS.ccminer_path(algoType, devGroupType);
                 case MinerBaseType.sgminer:
                     return AMD_GROUP.sgminer_path(algoType);
+                case MinerBaseType.GatelessGate:
+                    return AMD_GROUP.glg_path(algoType);
                 case MinerBaseType.nheqminer:
                     return Data.nheqminer;
                 case MinerBaseType.ethminer:
@@ -150,6 +153,8 @@ namespace NiceHashMiner.Miners.Grouping
                     return EXPERIMENTAL.GetPath(algoType, devGroupType);
                 case MinerBaseType.EWBF:
                     return Data.EWBF;
+                case MinerBaseType.DSTM:
+                    return Data.DSTM;
                 case MinerBaseType.Prospector:
                     return Data.prospector;
                 case MinerBaseType.Xmrig:
@@ -264,6 +269,15 @@ namespace NiceHashMiner.Miners.Grouping
                     return Data.sgminer_gm;
                 }
                 return Data.sgminer_5_6_0_general;
+            }
+            public static string glg_path(AlgorithmType type)
+            {
+                // AlgorithmType.Pascal == type || AlgorithmType.DaggerHashimoto == type || AlgorithmType.Decred == type || AlgorithmType.Lbry == type || AlgorithmType.X11Gost == type || AlgorithmType.DaggerHashimoto == type
+                if (AlgorithmType.CryptoNight == type || AlgorithmType.Equihash == type || AlgorithmType.NeoScrypt == type || AlgorithmType.Keccak == type)
+                {
+                    return Data.glg;
+                }
+                return Data.NONE; 
             }
 
             public static string ClaymorePath(AlgorithmType type) {
