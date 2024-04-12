@@ -46,7 +46,7 @@ namespace NiceHashMiner
         private int _flowLayoutPanelRatesIndex = 0;
 
         private const string BetaAlphaPostfixString = "";
-        const string ForkString = " Fork Fix 8";
+        const string ForkString = " Fork Fix 8.1";
 
         private bool _isDeviceDetectionInitialized = false;
 
@@ -827,9 +827,12 @@ namespace NiceHashMiner
             if (ver == null) return;
             var programVersion = "Fork_Fix_"+ConfigManager.GeneralConfig.ForkFixVersion.ToString();
             Helpers.ConsolePrint("Program version: ", programVersion);
+            Helpers.ConsolePrint("fff:", ver);
             var ret = programVersion.CompareTo(ver);
             if (ret < 0 || (ret == 0 && BetaAlphaPostfixString != ""))
             {
+                Helpers.ConsolePrint("Program version!: ", programVersion);
+                Helpers.ConsolePrint("fff!:", ver);
                 SetVersionLabel(string.Format(International.GetText("Form_Main_new_version_released").Replace("v{0}", "{0}"), ver));
                 _visitUrlNew = Links.VisitUrlNew + ver;
             }

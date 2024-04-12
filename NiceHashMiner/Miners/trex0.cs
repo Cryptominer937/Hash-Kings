@@ -18,9 +18,9 @@ using System.Net.Sockets;
 
 namespace NiceHashMiner.Miners
 {
-    public class CryptoDredge : Miner
+    public class trex : Miner
     {
-        public CryptoDredge() : base("CryptoDredge_NVIDIA")
+        public trex() : base("trex_NVIDIA")
         { }
 
         private int TotalCount = 0;
@@ -30,7 +30,15 @@ namespace NiceHashMiner.Miners
         double speed = 0;
         int count = 0;
 
-        private bool _benchmarkException => MiningSetup.MinerPath == MinerPaths.Data.CryptoDredge;
+       // private bool _benchmarkException => MiningSetup.MinerPath == MinerPaths.Data.trex;
+
+        bool benchmarkException
+        {
+            get
+            {
+                return MiningSetup.MinerPath == MinerPaths.Data.lyclMiner;
+            }
+        }
 
         protected override int GetMaxCooldownTimeInMilliseconds()
         {
@@ -46,27 +54,33 @@ namespace NiceHashMiner.Miners
             }
             var username = GetUsername(btcAdress, worker);
 
-             IsApiReadException = MiningSetup.MinerPath == MinerPaths.Data.CryptoDredge;
+            IsApiReadException = MiningSetup.MinerPath == MinerPaths.Data.CryptoDredge;
 
             var algo = "";
             var apiBind = "";
             string alg = url.Substring(url.IndexOf("://") + 3, url.IndexOf(".") - url.IndexOf("://") - 3);
             string port = url.Substring(url.IndexOf(".com:") + 5, url.Length - url.IndexOf(".com:") - 5);
-            algo = "--algo " + MiningSetup.MinerName;
-            apiBind = " --api-bind 127.0.0.1:" + ApiPort;
+            algo = "-a " + MiningSetup.MinerName.ToLower();
+            //apiBind = " --api-bind 127.0.0.1:" + ApiPort;
 
-            IsApiReadException = false;
+            IsApiReadException = true; //no api
+                                       /*
+                                       LastCommandLine = algo +
+                                           " -o " + url + " -u " + username + " -p x " +
+                                           " --url=stratum+tcp://" + alg + ".hk.nicehash.com:" + port + " " + " -u " + username + " -p x " +
+                                           " -o " + alg + ".jp.nicehash.com:" + port + " " + " -u " + username + " -p x " +
+                                           " -o " + alg + ".in.nicehash.com:" + port + " " + " -u " + username + " -p x " +
+                                           " -o " + alg + ".br.nicehash.com:" + port + " " + " -u " + username + " -p x " +
+                                           " -o " + alg + ".usa.nicehash.com:" + port + " " + " -u " + username + " -p x " +
+                                           " -o " + alg + ".eu.nicehash.com:" + port + " -u " + username + " -p x " +
+                                           apiBind + 
+                                           " -d " + GetDevicesCommandString() + " " +
+                                           ExtraLaunchParametersParser.ParseForMiningSetup(MiningSetup, DeviceType.NVIDIA) + " ";
+                                           */
             LastCommandLine = algo +
-                " -o " + url + " -u " + username + " -p x " +
-                " --url=stratum+tcp://" + alg + ".hk.nicehash.com:" + port + " " + " -u " + username + " -p x " +
-                " -o " + alg + ".jp.nicehash.com:" + port + " " + " -u " + username + " -p x " +
-                " -o " + alg + ".in.nicehash.com:" + port + " " + " -u " + username + " -p x " +
-                " -o " + alg + ".br.nicehash.com:" + port + " " + " -u " + username + " -p x " +
-                " -o " + alg + ".usa.nicehash.com:" + port + " " + " -u " + username + " -p x " +
-                " -o " + alg + ".eu.nicehash.com:" + port + " -u " + username + " -p x " +
-                apiBind + 
-                " -d " + GetDevicesCommandString() + " " +
-                ExtraLaunchParametersParser.ParseForMiningSetup(MiningSetup, DeviceType.NVIDIA) + " ";
+            " -o " + url + " -u " + username + " -p x " +
+            " -d " + GetDevicesCommandString() + " " +
+            ExtraLaunchParametersParser.ParseForMiningSetup(MiningSetup, DeviceType.NVIDIA) + " ";
 
             ProcessHandle = _Start();
         }
@@ -87,14 +101,16 @@ namespace NiceHashMiner.Miners
             string port = url.Substring(url.IndexOf(".com:") + 5, url.Length - url.IndexOf(".com:") - 5);
             var username = GetUsername(Globals.DemoUser, ConfigManager.GeneralConfig.WorkerName.Trim());
 
-            var commandLine = " --algo " + algorithm.MinerName +
-                             " -o" + url + " -u " + username + " -p x " +
-                " -o stratum+tcp://" + alg + ".hk.nicehash.com:" + port + " " + " -u " + username + " -p x " +
-                " -o stratum+tcp://" + alg + ".jp.nicehash.com:" + port + " " + " -u " + username + " -p x " +
-                " -o stratum+tcp://" + alg + ".in.nicehash.com:" + port + " " + " -u " + username + " -p x " +
-                " -o stratum+tcp://" + alg + ".br.nicehash.com:" + port + " " + " -u " + username + " -p x " +
-                " -o stratum+tcp://" + alg + ".usa.nicehash.com:" + port + " " + " -u " + username + " -p x " +
-                " -o stratum+tcp://" + alg + ".eu.nicehash.com:" + port + " -u " + username + " -p x " +
+            var commandLine = " -a " + algorithm.MinerName.ToLower() +
+                             " -o " + url + " -u " + username + " -p x " +
+                              /*
+                 " -o stratum+tcp://" + alg + ".hk.nicehash.com:" + port + " " + " -u " + username + " -p x " +
+                 " -o stratum+tcp://" + alg + ".jp.nicehash.com:" + port + " " + " -u " + username + " -p x " +
+                 " -o stratum+tcp://" + alg + ".in.nicehash.com:" + port + " " + " -u " + username + " -p x " +
+                 " -o stratum+tcp://" + alg + ".br.nicehash.com:" + port + " " + " -u " + username + " -p x " +
+                 " -o stratum+tcp://" + alg + ".usa.nicehash.com:" + port + " " + " -u " + username + " -p x " +
+                 " -o stratum+tcp://" + alg + ".eu.nicehash.com:" + port + " -u " + username + " -p x " +
+                 */
                               ExtraLaunchParametersParser.ParseForMiningSetup(
                                   MiningSetup,
                                   DeviceType.NVIDIA) +
@@ -110,27 +126,30 @@ namespace NiceHashMiner.Miners
 
         protected override bool BenchmarkParseLine(string outdata)
         {
-
-
-            if (_benchmarkException)
+            Helpers.ConsolePrint(MinerTag(), outdata);
+            /*
+            [ OK ] 1/1 - 1430.84 kH/s
+            [ OK ] 2/2 - 1431.48 kH/s
+            [ OK ] 3/3 - 1430.49 kH/s
+            [ OK ] 4/4 - 1431.24 kH/s
+            */
+            if (benchmarkException)
             {
-                if (outdata.Contains("GPU") && outdata.Contains("/s"))
+                Helpers.ConsolePrint(MinerTag(), outdata);
+                if (outdata.Contains("5/5") || outdata.Contains("4/5"))
                 {
 
-                    var st = outdata.IndexOf("Avr ");
+                    var st = outdata.IndexOf("- ");
                     var e = outdata.IndexOf("/s)");
 
-                    var parse = outdata.Substring(st + 4, e - st - 6).Trim();
+                    var parse = outdata.Substring(st, e - st - 5).Trim();
                     double tmp = Double.Parse(parse, CultureInfo.InvariantCulture);
                     // save speed
 
                     if (outdata.Contains("kH/s"))
-                        tmp *= 10;
+                        tmp *= 1000;
                     else if (outdata.Contains("Mh/s"))
-                        tmp *= 10000;
-                    else if (outdata.Contains("GH/s"))
-                        tmp *= 10000000;
-
+                        tmp *= 1000000;
 
                     speed += tmp;
                     count++;
@@ -158,6 +177,7 @@ namespace NiceHashMiner.Miners
 
         protected override void BenchmarkOutputErrorDataReceivedImpl(string outdata)
         {
+            Helpers.ConsolePrint("TREX:", outdata);
             CheckOutdata(outdata);
         }
 
@@ -220,58 +240,26 @@ namespace NiceHashMiner.Miners
         public override async Task<ApiData> GetSummaryAsync()
         {
             CurrentMinerReadStatus = MinerApiReadStatus.NONE;
-            var ad = new ApiData(MiningSetup.CurrentAlgorithmType, MiningSetup.CurrentSecondaryAlgorithmType);
-
-            string resp = null;
-            try
+            var totalSpeed = 0.0d;
+            foreach (var miningPair in MiningSetup.MiningPairs)
             {
-                var bytesToSend = Encoding.ASCII.GetBytes("summary");
-                var client = new TcpClient("127.0.0.1", ApiPort);
-                var nwStream = client.GetStream();
-                await nwStream.WriteAsync(bytesToSend, 0, bytesToSend.Length);
-                var bytesToRead = new byte[client.ReceiveBufferSize];
-                var bytesRead = await nwStream.ReadAsync(bytesToRead, 0, client.ReceiveBufferSize);
-                var respStr = Encoding.ASCII.GetString(bytesToRead, 0, bytesRead);
-
-                client.Close();
-                resp = respStr;
-            }
-            catch (Exception ex)
-            {
-                Helpers.ConsolePrint(MinerTag(), "GetSummary exception: " + ex.Message);
-            }
-
-            if (resp != null )
-            {
-                    var st = resp.IndexOf(";KHS=");
-                    var e = resp.IndexOf(";SOLV=");
-                    var parse = resp.Substring(st + 5, e - st - 5).Trim();
-                    double tmp = Double.Parse(parse, CultureInfo.InvariantCulture);
-                ad.Speed = tmp*1000;
-                  
-                    
-                
-
-                if (ad.Speed == 0)
+                var algo = miningPair.Device.GetAlgorithm(MinerBaseType.trex, AlgorithmType.Lyra2z, AlgorithmType.NONE);
+                if (algo != null)
                 {
-                    CurrentMinerReadStatus = MinerApiReadStatus.READ_SPEED_ZERO;
-                } else
-                {
-                    CurrentMinerReadStatus = MinerApiReadStatus.GOT_READ;
-                }
-
-                // some clayomre miners have this issue reporting negative speeds in that case restart miner
-                if (ad.Speed < 0)
-                {
-                    Helpers.ConsolePrint(MinerTag(), "Reporting negative speeds will restart...");
-                    Restart();
+                    totalSpeed += algo.BenchmarkSpeed;
                 }
             }
 
-            return ad;
+            var trexData = new ApiData(MiningSetup.CurrentAlgorithmType)
+            {
+                Speed = totalSpeed
+            };
+            CurrentMinerReadStatus = MinerApiReadStatus.GOT_READ;
+            // check if speed zero
+            if (trexData.Speed == 0) CurrentMinerReadStatus = MinerApiReadStatus.READ_SPEED_ZERO;
+            return trexData;
+
+
         }
-
-
     }
-
 }
